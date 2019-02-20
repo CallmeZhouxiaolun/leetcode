@@ -33,4 +33,28 @@ public:
         return result;
     }
 };
+参考讨论去之后，我们可以采用哈希表的方式，key为数组元素，而value为对应索引
+这里贴上find函数：
+find函数。
+iterator find ( const key_type& key );
+如果key存在，则find返回key对应的迭代器，如果key不存在，则find返回unordered_map::end。因此可以通过
+map.find(key) == map.end()
+来判断，key是否存在于当前的unordered_map中。
+
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        int n = nums.size(), l = 0, r = n - 1;
+        unordered_map<int,int> mp;
+        for(int i=0; i<nums.size(); i++){
+            if(mp.find(target-nums[i]) != mp.end()){
+                l = mp[target - nums[i]];
+                r = i;
+                break;
+            }
+            mp[nums[i]] =i;
+        }
+        return {l, r};
+    }
+};
 
