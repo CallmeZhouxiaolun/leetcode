@@ -1,0 +1,103 @@
+题目描述：
+You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order and each of their nodes contain a single digit. Add the two numbers and return it as a linked list.
+
+You may assume the two numbers do not contain any leading zero, except the number 0 itself.
+
+Example:
+
+Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
+Output: 7 -> 0 -> 8
+Explanation: 342 + 465 = 807.
+
+我的最初答案是：
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        unsigned int num=0;
+        int i=0;
+        for(; l1!=NULL; l1=l1->next, i++){
+            num= pow(10,i)*l1->val+num;
+        }
+        i=0;
+        for(;l2!=NULL; l2=l2->next, i++){
+            num =pow(10,i)*l2->val +num;
+        }
+
+        int tmp=num%10;
+        num/=10;
+        
+        ListNode* result = new ListNode(tmp);
+        result->next = NULL;
+        ListNode* r =result;
+        
+        while(num !=0){
+            tmp = num%10;
+            num/=10;
+            ListNode* p= new ListNode(tmp);
+            r->next = p;
+            r=p;
+        }
+        r->next =NULL;
+        
+        return result;
+    }
+};
+这里对于小数字正确  但是对于
+Input
+[9]
+[1,9,9,9,9,9,9,9,9,9]
+Output
+[8,0,4,5,6,0,0,1,4,1]
+Expected
+[0,0,0,0,0,0,0,0,0,0,1]
+
+输出错误。
+
+
+
+查看solution后  根据伪代码重新编写代码：
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode* dummHead = new ListNode(0);
+        int carry=0;
+        ListNode* p=l1, *q=l2, *r=dummHead;
+        while(p!=NULL || q!=NULL){
+            int x = (p!=NULL) ? p->val : 0;
+            int y = (q!=NULL) ? q->val : 0;
+            int sum = x+y+carry;
+            carry = sum/10;
+            r->next= new ListNode(sum%10);
+            r = r->next;
+            if(p!=NULL) 
+                p=p->next;
+            if(q!=NULL)
+                q=q->next;
+        }
+        if(carry!= 0){
+            r->next= new ListNode(carry);
+            r = r->next;
+        }
+        return dummHead->next;
+    }
+};
+这里不再是单独求取链表代表的书之后求解，而是边遍历边求解，设置进位carry，若对应位置上超过10，则设置carry为1，每轮加carry。
+这里我们设置了虚拟头结点，因此，在输出是我们输出虚拟头结点的下一个节点。
+这里采用的是尾插法，根据尾插法我们要记得设置尾节点r
