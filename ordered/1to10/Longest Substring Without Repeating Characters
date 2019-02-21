@@ -1,1 +1,82 @@
+题目描述：
+Given a string, find the length of the longest substring without repeating characters.
+
+Example 1:
+
+Input: "abcabcbb"
+Output: 3 
+Explanation: The answer is "abc", with the length of 3. 
+Example 2:
+
+Input: "bbbbb"
+Output: 1
+Explanation: The answer is "b", with the length of 1.
+Example 3:
+
+Input: "pwwkew"
+Output: 3
+Explanation: The answer is "wke", with the length of 3. 
+             Note that the answer must be a substring, "pwke" is a subsequence and not a substring.
+
+开始的想法是设置tmp字符串，每次从原字符串中提取一个字符判断其是否在tmp中，若不在就+1，并将该字符加入到tmp中，
+否则就可以确定不能讲该字符加入到前面的字符中（会造成重复）。
+这里不能从错误处直接开始，例如dvdf，如果从错误的d除直接开始，就会认为最大为2，而错过最长子串vdf
+Input:
+"dvdf"
+Output:
+2
+Expected:
+3
+本方法即为暴力方法，即我们考虑了所有的子串，效率较低
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int max=0;
+        for(int i=0; i<s.length(); i++){
+            string str=s.substr(i);
+            int n=0, l=0;
+            string tmp="";
+            while(l<str.length()){
+                if(tmp.find(str[l]) != string::npos){
+                    if(n>max)
+                        max=n;
+                    break;
+                }else{
+                    tmp+=str[l++];
+                    n++;
+                }
+            }
+            if(n>max)
+                max=n;
+        }
+        
+        return max;
+    }
+};
+
+2.在查看solution之后，可以发现在数组及字符串子串问题上，我们可以使用滑动窗口
+们使用 HashSet 将字符存储在当前窗口 [i,j)[i,j)（最初 j=i）中。 
+然后我们向右侧滑动索引j，如果它不在 HashSet 中，我们会继续滑动j。
+直到 s[j] 已经存在于 HashSet 中。此时，我们找到的没有重复字符的最长子字符串将会以索引 ii 开头。
+如果我们对所有的 ii 这样做，就可以得到答案。
+这里，由于查找一个字符串是否在子串中，需要检查整个字符串，时间复杂度为O(n^2),因此采用哈希的方式。
+这样可以用O(1)的时间来完成对字符是否在当前的子字符串中的检查。
+
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int max_len=0;
+        map<char, int> mp;
+        for(int left=0, right=0; right< s.length(); right++){
+            if(mp.find(s[right])!= mp.end()){
+                //这里之所以进行max是因为查找到的字符可能会在滑动窗口外部，也即是滑动窗口前部，这种情况下不需要移动left。
+                left = max(left, mp[s[right]]+1);
+            }
+            mp[s[right]]= right;
+            max_len = max(max_len, right-left+1);
+        }
+        return max_len;
+    }
+};
+
 
