@@ -1,0 +1,86 @@
+题目描述：
+There are two sorted arrays nums1 and nums2 of size m and n respectively.
+
+Find the median of the two sorted arrays. The overall run time complexity should be O(log (m+n)).
+
+You may assume nums1 and nums2 cannot be both empty.
+
+Example 1:
+
+nums1 = [1, 3]
+nums2 = [2]
+
+The median is 2.0
+Example 2:
+
+nums1 = [1, 2]
+nums2 = [3, 4]
+
+The median is (2 + 3)/2 = 2.5
+
+简单概述一下即输出两个有序数组的中位数。
+我们想一下中位数的概念就可以知道，中位数将一个序列划分为两个相同大小的序列，同时左边序列都小于右边序列。
+因此，我们可以将寻找中位数的问题转化为寻找第K大数字的问题。
+（若序列为奇数，K为中间数字， 若序列为偶数：K为中间两个数字平均数。）
+
+针对寻找第K大数字的问题，同属为了达到log级别的复杂度，我们可以利用一下两个结论：
+每次在A，B取前k/2个元素。有以下这些情况：
+1).  A的元素个数 < k/2. 则我们可以丢弃B前k/2. 反之亦然
+证明：
+我们使用反证法。
+假设第K大在B的前k/2中，例如位置在索引m(m <= k/2-1)那么A必然拥有前k中的k -(m+1)个元素，而
+m <= k/2-1,则 m+1 <= k/2  , k - (m+1) >= k/2与条件：A的元素不够k/2矛盾，所以假设不成立，得证。
+举个栗子：
+A: 6 7 8
+B: 1 2 3 4 5
+找第8大的数字，
+2). A[mid] < B[mid] (mid是k/2 -1索引处的元素）。
+这种情况下，我们可以丢弃A前k/2。
+证明：
+我们使用反证法。
+假设第K大在A的前k/2中记为maxK，例如位置在索引m(m <= k/2-1)那么B必然拥有前k中的k -(m+1)个元素，而
+m <= k/2-1,则 m+1 <= k/2  , k - (m+1) > k/2
+推出B[mid] <= maxK
+而A[mid] >= maxK 推出 A[mid]>=B[mid], 与题设矛盾。所以假设不能成立。
+举个栗子：
+A: 1 2
+B: 4 5 6 7 8
+找第四大的数字 我们就可以首先排除1，2.
+
+针对这里的两个结论，可以编写如下代码：
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int num =nums1.size() + nums2.size();
+        double result;
+        
+        if(num & 1){
+            result = findKth(nums1, nums2, 0, 0, num/2 + 1);
+        }else{
+            result = (findKth(nums1, nums2, 0, 0, num/2)
+                + findKth(nums1, nums2, 0, 0, num/2 + 1))/2.0;
+        }
+        
+        return result;
+    }
+    
+    double findKth(vector<int>& nums1, vector<int>& nums2, int st1, int st2, int k ){
+        // 边界情况，任一数列为空
+        if(st1>= nums1.size())
+            return nums2[st2+k-1];
+        if(st2>= nums2.size())
+            return nums1[st1+k-1];
+        // k等于1时表示取最小值，直接返回min
+        if(k==1)
+            return min(nums1[st1], nums2[st2]);
+        int key1 = st1+k/2-1 >= nums1.size() ? INT_MAX : nums1[st1+k/2-1];
+        int key2 = st2+k/2-1 >= nums2.size() ? INT_MAX : nums2[st2+k/2-1];
+        
+        if(key1< key2){
+            return findKth(nums1, nums2, st1+k/2, st2, k-k/2);
+        }
+        else{
+            return findKth(nums1, nums2, st1, st2+k/2, k-k/2);
+        }
+    }
+};
