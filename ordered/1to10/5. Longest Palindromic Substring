@@ -1,0 +1,124 @@
+题目描述：
+Given a string s, find the longest palindromic substring in s. You may assume that the maximum length of s is 1000.
+
+Example 1:
+
+Input: "babad"
+Output: "bab"
+Note: "aba" is also a valid answer.
+Example 2:
+
+Input: "cbbd"
+Output: "bb"
+
+简单来说就是寻找字符串中最长的回文。
+在最开始自己写的时候把回文区分成两种：
+一种是奇数长的回文，这样的回文在寻找时，只要从某个位置开始，同时往两边扩展，变扩展变判断，
+    同时注意边界条件就可以了；
+第二种是偶数长的回文，这样的回文在寻找时，要从相邻的两个位置想两边扩展，边扩展边判断，
+    同时注意边界条件。
+代码如下所示：
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        string result="";
+        if(s.size() == 0)
+            return result;
+        //寻找奇数长的回文
+        for(int i=0; i<=s.size()-1; i++){
+            int j=i, k=i;
+            string tmp = "";
+            while( j>=0 && k<= s.size()-1 && s[j] == s[k] ){
+                j--;
+                k++;
+            }
+            if(j!=k)
+                tmp = s.substr(j+1, k-j-1);
+            else
+                tmp+=s[i];
+            if(tmp.size() >= result.size())
+                result = tmp;
+        }
+        //寻找偶数长的回文
+        for(int i=0, j=1; j<=s.size()-1; i++, j++){
+            int m=i, n=j;
+            string tmp = "";
+            while( m>=0 && n<= s.size()-1 && s[m] == s[n] ){
+                m--;
+                n++;
+            }
+            if(n-m !=1)
+                tmp = s.substr(m+1, n-m-1);
+
+            if(tmp.size() >= result.size())
+                result = tmp;
+        }
+        
+        return result;
+    }
+};
+
+solution 里面列举了5种方法,这里我们一种一种实现：
+第一种是暴力法，即我们找出所有的子串，然后判断其是否为回文即可。
+//方法一，暴力法
+// class Solution {
+// public:
+//     string longestPalindrome(string s) {
+//         string result="";
+//         int max_len=0;
+//         for(int i=0; i<s.size(); i++){
+//             for(int j=i; j<s.size(); j++){
+//                 string tmp= s.substr(i, j-i+1);
+//                 if(isPalindromic(tmp) == true && tmp.size()> max_len){
+//                     result = tmp;
+//                     max_len=tmp.size();
+//                 }
+//             } 
+//         }
+//         return result;
+//     }
+    
+//     bool isPalindromic(string s){
+//         for(int i=0; i<=s.size()/2; i++){
+//             if(s[i] != s[s.size()- i-1])
+//                 return false;
+//         }
+//         return true;
+//     }
+// };
+
+第二种是基于动态规划的暴力法的优化：
+
+
+第三种方法是扩展中心法，我原本的方法即算是扩展中心法，确定一个中心向两边扩展即可；
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        string result;
+        
+        if(s.size() == 0)
+            return "";
+
+        int start=0,end=0;
+        for(int i=0; i<s.size(); i++){
+            int len1 = extendAroundCenter(s, i, i);
+            int len2 = extendAroundCenter(s, i, i+1);
+            
+            int len = (len1>len2) ? len1 :len2;
+            
+            if(len> end-start+1){
+                start =i-(len-1)/2;
+                end = i+ len/2;
+            }
+        }
+        return s.substr(start, end-start+1);
+    }
+    
+    int extendAroundCenter(string s, int left, int right){
+        while(left >=0 && right <s.size() && s[left]== s[right]){
+            left--;
+            right++;
+        }
+        return right- left-1;
+    }
+};
