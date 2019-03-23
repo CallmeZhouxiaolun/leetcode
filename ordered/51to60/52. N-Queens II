@@ -1,0 +1,27 @@
+和上一题一样，只是我们不需要求最后的结果，只需要求数量就可以了
+```
+class Solution {
+public:
+    int totalNQueens(int n) {
+        int res=0; 
+        vector<bool> row(n, true);
+        vector<bool> col(n, true);
+        vector<bool> slash(2*n-1, true);
+        vector<bool> backslash(2*n-1, true);
+        dfs(0, res, row, col, slash, backslash);
+        return res;
+    }
+    void dfs(int k, int& res, vector<bool>& row, vector<bool>& col, vector<bool>& slash, vector<bool>& backslash){
+        if(k == row.size())
+            res++;
+        for(int j=0; j<row.size(); j++){
+            if(row[k] && col[j] && slash[k+j] && backslash[j-k+row.size()-1]){
+                row[k] = col[j] = slash[k+j] = backslash[j-k+row.size()-1] = false;
+                dfs(k+1, res, row, col, slash, backslash);
+                row[k] = col[j] = slash[k+j] = backslash[j-k+row.size()-1] = true;
+            }
+        }
+    }
+    
+};
+```
