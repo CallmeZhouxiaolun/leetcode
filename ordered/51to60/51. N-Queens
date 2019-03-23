@@ -1,0 +1,71 @@
+n皇后是比较知名的问题了，每行每列相同斜线不能有两个皇后
+
+本道题目比较简单，一看就可以知道采用DFS的方法，同时需要记录行、列、斜线出现皇后的情况，这里row记录了出现的列索引（为了push），斜线应该是两条斜线，
+我们画图仔细讨论索引与斜线的关系，一条是索引和相同，一条是索引差相同
+```
+class Solution {
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        vector<vector<string>> res;
+        vector<int> row(n, -1);
+        vector<int> col(n, 0);
+        vector<int> slash(2*n-1, 0);
+        vector<int> backslash(2*n-1, 0);
+        dfs(res, row, col, slash, backslash, 0);
+        return res;
+    }
+    void dfs(vector<vector<string>>& res, vector<int>& row, vector<int>& col, vector<int>& slash, vector<int>& backslash, int k){
+        if(k == row.size()){
+            vector<string> tmp(row.size(), string(row.size(), '.'));
+            for(int i=0; i< row.size(); i++){
+                tmp[i][row[i]] = 'Q';
+            }
+            res.push_back(tmp);
+            return;
+        }
+        for(int j=0; j<row.size(); j++){
+            if(row[k] == -1 && col[j] == 0 && slash[k+j] ==0 && backslash[j-k+row.size()-1] ==0){
+                row[k] = j;
+                col[j] = slash[k+j] = backslash[j-k+row.size()-1] =1;
+                dfs(res, row, col, slash, backslash, k+1);
+                row[k] = -1;
+                col[j] = slash[k+j] = backslash[j-k+row.size()-1] =0;
+            }
+        }
+    }
+};
+```
+
+看了solution之后 方法相同，就改了vector的类型，少写了一部分，for循环，DFS之后row[k]的值可以不改变，反正下一次会覆盖。
+```
+class Solution {
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        vector<vector<string>> res;
+        vector<int> row(n, -1);
+        vector<bool> col(n, true);
+        vector<bool> slash(2*n-1, true);
+        vector<bool> backslash(2*n-1, true);
+        dfs(res, row, col, slash, backslash, 0);
+        return res;
+    }
+    void dfs(vector<vector<string>>& res, vector<int>& row, vector<bool>& col, vector<bool>& slash, vector<bool>& backslash, int k){
+        if(k == row.size()){
+            vector<string> tmp(row.size(), string(row.size(), '.'));
+            for(int i=0; i< row.size(); i++){
+                tmp[i][row[i]] = 'Q';
+            }
+            res.push_back(tmp);
+            return;
+        }
+        for(int j=0; j<row.size(); j++){
+            if(col[j] && slash[k+j] && backslash[j-k+row.size()-1]){
+                row[k] = j;
+                col[j] = slash[k+j] = backslash[j-k+row.size()-1] =false;
+                dfs(res, row, col, slash, backslash, k+1);
+                col[j] = slash[k+j] = backslash[j-k+row.size()-1] =true;
+            }
+        }
+    }
+};
+```
