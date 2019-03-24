@@ -1,0 +1,55 @@
+
+Given a matrix of m x n elements (m rows, n columns), return all elements of the matrix in spiral order.
+
+Example 1:
+
+Input:
+[
+ [ 1, 2, 3 ],
+ [ 4, 5, 6 ],
+ [ 7, 8, 9 ]
+]
+Output: [1,2,3,6,9,8,7,4,5]
+Example 2:
+
+Input:
+[
+  [1, 2, 3, 4],
+  [5, 6, 7, 8],
+  [9,10,11,12]
+]
+Output: [1,2,3,4,8,12,11,10,9,5,6,7]
+题目描述：
+就是按照顺序螺旋插入，主要是索引有点晕，画图慢慢写：
+```
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        if(matrix.empty())
+            return {};
+        int m= matrix.size(), n =matrix[0].size();
+        vector<int> res;
+        int row_up=0, row_below= m-1, l=0, r=n-1;
+        while(true){
+            for(int j=l ;j <=r ; j++){
+                res.push_back(matrix[row_up][j]);
+            }
+            if(++row_up > row_below) break;
+            for(int j= row_up; j<= row_below; j++){
+                res.push_back(matrix[j][r]);
+            }
+            if(--r <l) break;
+            for(int j= r; j>=l; j--){
+                res.push_back(matrix[row_below][j]);
+            }
+            if(--row_below < row_up) break;
+            for(int j=row_below; j>= row_up; j--){
+                res.push_back(matrix[j][l]);
+            }
+            if(++l > r) break;
+        }
+        return res;
+    }
+};
+
+```
