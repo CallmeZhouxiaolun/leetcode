@@ -1,0 +1,91 @@
+Given an array A of integers, return true if and only if we can partition the array into three non-empty parts with equal sums.
+
+Formally, we can partition the array if we can find indexes i+1 < j with (A[0] + A[1] + ... + A[i] == A[i+1] + A[i+2] + ... + A[j-1] == A[j] + A[j-1] + ... + A[A.length - 1])
+
+ 
+
+Example 1:
+
+Input: [0,2,1,-6,6,-7,9,1,2,0,1]
+Output: true
+Explanation: 0 + 2 + 1 = -6 + 6 - 7 + 9 + 1 = 2 + 0 + 1
+Example 2:
+
+Input: [0,2,1,-6,6,7,9,-1,2,0,1]
+Output: false
+Example 3:
+
+Input: [3,3,6,5,-2,2,5,1,-9,4]
+Output: true
+Explanation: 3 + 3 = 6 = 5 - 2 + 2 + 5 + 1 - 9 + 4
+ 
+
+Note:
+
+3 <= A.length <= 50000
+-10000 <= A[i] <= 10000
+
+这个题目开始做的比较麻烦，真真是想的太复杂了。。。所以一直超时
+```
+class Solution {
+public:
+    bool canThreePartsEqualSum(vector<int>& A) {
+        if(A.size() <3)
+            return false;
+        int partition =0;
+        long int sum=0;
+        while(partition < A.size()-2){
+            if(canTwoPartsEqualSum(A, partition+1, sum)){
+                long int sum1 =0;
+                for(int i=0; i<= partition; i++)
+                    sum1 += A[i];
+                if(sum == sum1)
+                    return true;
+            }
+            partition++;
+        }
+        return false;
+    }
+    bool canTwoPartsEqualSum(vector<int>& A, int k, long int& sum){
+        int partition =k+1;
+        while(partition < A.size()){
+            long int sum1=0, sum2=0;
+            for(int i=k; i<A.size(); i++){
+                if(i < partition)
+                    sum1+=A[i];
+                else
+                    sum2+=A[i];
+            }
+            if(sum1 == sum2){
+                sum = sum1;
+                return true;
+            }
+            partition++;
+        }
+        return false;
+    }
+};
+```
+
+服了服了服了！！！！
+其实想一下，我们计算数组元素和，不是3的倍数就return false就可以了，如果是，那就遍历每一个元素，看看能不能得到三个total/3；
+这里学到了stl accumulate()函数  具体使用情况如链接描述：https://blog.csdn.net/Jeanphorn/article/details/45114233
+```
+class Solution {
+public:
+    bool canThreePartsEqualSum(vector<int>& A) {
+        int total = accumulate(A.begin(), A.end(), 0);
+        if(total %3 != 0)
+            return false;
+        int sum=0, part=0;
+        for(auto value : A){
+            sum += value;
+            if(sum == total/3){
+                ++part;
+                sum=0;
+            }
+        }
+        return part == 3;
+    }
+};
+```
