@@ -1,0 +1,55 @@
+Given an array A of positive integers, A[i] represents the value of the i-th sightseeing spot, and two sightseeing spots i and j have distance j - i between them.
+
+The score of a pair (i < j) of sightseeing spots is (A[i] + A[j] + i - j) : the sum of the values of the sightseeing spots, minus the distance between them.
+
+Return the maximum score of a pair of sightseeing spots.
+
+ 
+
+Example 1:
+
+Input: [8,1,5,2,6]
+Output: 11
+Explanation: i = 0, j = 2, A[i] + A[j] + i - j = 8 + 5 + 0 - 2 = 11
+ 
+
+Note:
+
+2 <= A.length <= 50000
+1 <= A[i] <= 1000
+
+本来很开心的以为很简单。。最后超时超时超时！！！
+```
+class Solution {
+public:
+    int maxScoreSightseeingPair(vector<int>& A) {
+        if(A.size() <2)
+            return 0;
+        int max_res=INT_MIN;
+        for(int i=0; i<A.size()-1; i++){
+            for(int j=i+1; j<A.size(); j++){
+                int tmp = A[i] +A[j] +i -j;
+                if(tmp > max_res)
+                    max_res = tmp;
+            }
+        }
+        return max_res;
+    }
+};
+```
+
+后面看到了solution 大佬的方法,仔细想一下公式为A[i] + A[j] -distance; 我们以第一个元素为基准max_i，每次前进一步他的实际代价相当于--max_i;
+也就是说到达j位置的时候，他的实际代价为原本的值减去走过的距离，我们可以将这时候max_i的实际代价与A[j]比较，更新max_i;
+```
+class Solution {
+public:
+    int maxScoreSightseeingPair(vector<int>& A) {
+        int res =0, max_i=A[0]-1;
+        for(int i=1; i<A.size(); i++, max_i--){
+            res = max(res, max_i + A[i]);
+            max_i = max(max_i, A[i]);
+        }
+        return res;
+    }
+};
+```
