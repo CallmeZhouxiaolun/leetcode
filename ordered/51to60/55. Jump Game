@@ -1,0 +1,41 @@
+Given an array of non-negative integers, you are initially positioned at the first index of the array.
+
+Each element in the array represents your maximum jump length at that position.
+
+Determine if you are able to reach the last index.
+
+Example 1:
+
+Input: [2,3,1,1,4]
+Output: true
+Explanation: Jump 1 step from index 0 to 1, then 3 steps to the last index.
+Example 2:
+
+Input: [3,2,1,0,4]
+Output: false
+Explanation: You will always arrive at index 3 no matter what. Its maximum
+             jump length is 0, which makes it impossible to reach the last index.
+
+这里和之前Jump Game II 一样，唯一的不同就是这里可能不能到达终点，因为存在0，因此，不同于上一题，我们设置maxend=end（因为当前元素值为0，
+下一次范围还是本身，） start=end（如maxend理由相同），这里添加了一个if语句，既是当我们走了一次之后发现start== end说明我们依旧停留在原地，
+也就是说该处元素值为0；
+```
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int n= nums.size(), start=0, end=0, step=0;
+        while(end < n-1){
+            step++;
+            int maxend= end;
+            for(int i=start; i<=end; i++){
+                if(i+nums[i] >= n-1) return true;
+                maxend = max(maxend, i+nums[i]);
+            }
+            start =end;
+            end = maxend;
+            if(start == end) return false;
+        }
+        return true;
+    }
+};
+```
