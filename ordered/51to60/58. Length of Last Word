@@ -1,0 +1,27 @@
+题目：
+Given a string s consists of upper/lower-case alphabets and empty space characters ' ', return the length of last word in the string.
+
+If the last word does not exist, return 0.
+
+Note: A word is defined as a character sequence consists of non-space characters only.
+
+Example:
+
+Input: "Hello World"
+Output: 5
+比较简单，这里应该从后往前遍历，略去尾部空格，然后计数，遇到第一个空格时候break
+
+class Solution { 
+public:
+    int lengthOfLastWord(string s) {
+        int n= s.size()-1, res=0;
+        while(n>=0 && s[n] == ' ')
+            n--;
+        for(int i=n; i>=0; i--){
+            if(s[i] == ' ')
+                break;
+            res++;
+        }
+        return res;
+    }
+};
