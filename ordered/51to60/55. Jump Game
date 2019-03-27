@@ -39,4 +39,46 @@ public:
     }
 };
 ```
+看了solution之后发现dp算法，设置数组记录状态，每个元素状态为GOOD、BAD、UNKNOW,最除都是UNKNOW,最后一个元素为GOOD
+```
+
+class Solution {
+public:
+    enum Index{GOOD, BAD, UNKNOW};
+    vector<Index> memo;
+    bool canJump(vector<int>& nums) {
+        for(int i=0; i<nums.size(); i++)
+            memo.push_back(UNKNOW);
+        memo[memo.size()-1] = GOOD;
+        
+        for(int i= nums.size()-2; i>=0; i--){
+            int tmp1 = nums[i]+i, tmp2=nums.size()-1;
+            int furthesJump = min(tmp1, tmp2);
+            for(int j= i+1; j<= furthesJump; j++){
+                if(memo[j] == GOOD){
+                    memo[i] = GOOD;
+                    break;
+                }
+            }
+        }
+        return memo[0] == GOOD;
+    }
+};
+```
+
+还有一种更方便的贪心法，也就是我们如果能到达最近的GOOD点就代表该元素为GOOD，并更新最近GOOD点
+```
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int lastPos = nums.size()-1;
+        for(int i= nums.size()-2; i>=0; i--){
+            if(i+nums[i] >= lastPos){
+                lastPos =i;
+            }
+        }
+        return lastPos == 0;
+    }
+};
+```
 
