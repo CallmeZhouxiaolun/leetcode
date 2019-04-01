@@ -40,3 +40,75 @@ public:
     }
 };
 ```
+
+这里可以使用仿函数，仿函数传入时候传入的是对象
+```
+    struct cmp{
+        bool operator()(Interval& a, Interval& b){
+            return a.start < b.start;
+        }
+    };
+    
+    vector<Interval> merge(vector<Interval>& intervals) {
+        vector<Interval> res;
+        if(intervals.empty())
+            return res;
+        sort(intervals.begin(), intervals.end(), cmp()); //注意
+        res.push_back(intervals[0]);
+        for(int i=1; i<intervals.size(); i++){
+            if(res.back().end >= intervals[i].start){
+                Interval tmp(res.back().start, max(res.back().end, intervals[i].end));
+                res.pop_back();
+                res.push_back(tmp);
+            }
+            else
+                res.push_back(intervals[i]);
+        }
+        return res;
+    }
+    ```
+    
+总结   
+对于复合类型，实现排序方式有3种方法：
+1） 重载operator<操作符
+2） 写全局的比较函数
+3） 写仿函数，重载operator()形式为：bool operator()(const 类名& 参数){…}
+
+下面看看这3种方法的实现：
+// 排序元素，比较的对象
+struct Person
+{
+  Person(int id, const string& name, int age): id_(id), name_(name), age_(age)
+  {}
+  
+  int id_;
+  string name_;
+  int age_;
+};
+// 方式1：重载operator<用于排序时的比较(写在函数体内)
+bool operator< (const Person& rt)
+{
+  return this->id_ < rt.id_;
+}
+ 
+// 排序函数写法，默认调用operator<
+sort(members.begin(), members.end());
+// 方式2：写比较函数
+bool CompAge(const Person& pl, const Person& pr)
+{
+  return pl.age_ < pr.age_;
+}
+ 
+// 排序时传入比较函数指针
+sort(members.begin(), members.end(), CompAge);
+// 方式3：仿函数
+struct CompName
+{
+  bool operator()(const Person& pl, const Person& pr)
+  {
+    return pl.name_ < pr.name_;
+  }
+};
+ 
+// 排序时传入函数对象
+sort(members.begin(), members.end(), CompName());
