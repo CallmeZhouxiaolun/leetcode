@@ -1,0 +1,63 @@
+
+Given a set of non-overlapping intervals, insert a new interval into the intervals (merge if necessary).
+
+You may assume that the intervals were initially sorted according to their start times.
+
+Example 1:
+
+Input: intervals = [[1,3],[6,9]], newInterval = [2,5]
+Output: [[1,5],[6,9]]
+Example 2:
+
+Input: intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]
+Output: [[1,2],[3,10],[12,16]]
+Explanation: Because the new interval [4,8] overlaps with [3,5],[6,7],[8,10].
+
+这道题比较简单，因为他是没有重叠的而且是有序的，那么我们只需要遍历一遍即可；
+首先判断intervals[i].end < newInterval.start， 这部分略过即可；
+我们需要处理的是newInterval.end <= intervalsp[i].start 这部分，我第一次采取的办法是在源数组上修改，即将这部分删除
+```
+class Solution {
+public:
+    vector<Interval> insert(vector<Interval>& intervals, Interval newInterval) {
+        int i;
+        for(i=0; i< intervals.size() && intervals[i].end < newInterval.start; i++);
+        if(i == intervals.size()){
+            intervals.push_back(newInterval);
+            return intervals;
+        }
+        int start = newInterval.start, end =newInterval.end;
+        while(i< intervals.size() && intervals[i].start <= newInterval.end){
+            start = min(start, intervals[i].start);
+            end = max(end, intervals[i].end);
+            intervals.erase(intervals.begin()+i);
+        }
+        Interval tmp(start, end);
+        intervals.insert(intervals.begin()+i, tmp);
+        return intervals;
+    }
+};
+```
+后来发现时间比较慢，估计是删除的原因，后来该做新建立一个数组，把符合要求的插入，这样的话时间就大大减少了（思想是一样的）
+```
+class Solution {
+public:
+    vector<Interval> insert(vector<Interval>& intervals, Interval newInterval) {
+        vector<Interval> res;
+        int i=0;
+        while(i < intervals.size() && intervals[i].end < newInterval.start){
+            res.push_back(intervals[i]);
+            i++;
+        }
+        while(i< intervals.size() && intervals[i].start <= newInterval.end){
+            newInterval.start = min(newInterval.start, intervals[i].start);
+            newInterval.end = max(newInterval.end, intervals[i].end);
+            i++;
+        }
+        res.push_back(newInterval);
+        while(i< intervals.size())
+            res.push_back(intervals[i++]);
+        return res;
+    }
+};
+```
