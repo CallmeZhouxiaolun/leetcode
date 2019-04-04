@@ -1,0 +1,63 @@
+The set [1,2,3,...,n] contains a total of n! unique permutations.
+
+By listing and labeling all of the permutations in order, we get the following sequence for n = 3:
+
+"123"
+"132"
+"213"
+"231"
+"312"
+"321"
+Given n and k, return the kth permutation sequence.
+
+Note:
+
+Given n will be between 1 and 9 inclusive.
+Given k will be between 1 and n! inclusive.
+Example 1:
+
+Input: n = 3, k = 3
+Output: "213"
+Example 2:
+
+Input: n = 4, k = 9
+Output: "2314"
+
+这道题的想法也很简单，其实对于给定数字k，长度n,我们首先判断k / (n-1！)这样我们就可以知道将哪个数字放在第一位，将k %(n-1!)后递归处理即可
+这里需要注意一点 我们传递k时，其实传递的是k-1；因为我们要营造一种模式：例如 1 2 3; 2！=2，我们需要让k=1、2时候将1放在第一位，k=3、4时将2放在第一位；
+其实就是说 (k的表达式)/2!的结果符合上面的规则；很简单的 k的表达式为：k-1
+```
+class Solution {
+public:
+    string getPermutation(int n, int k) {
+        vector<int> res_int(n, 0);
+        for(int i=0; i<n; i++)
+            res_int[i] = i+1;
+        string res="";
+        func(res_int, 0, k-1 ,n);
+        for(int i=0; i<n; i++)
+            res.push_back(res_int[i]+'0');
+        return res;
+    }
+    void func(vector<int>& res_int, int l, int k, int n){
+        if(l == n && k == 0)
+            return;
+        int tmp = k/(factorial(n-l-1));
+        k %= (factorial(n-l-1));
+        swap(res_int[l], res_int[l+tmp]);
+        sort(res_int.begin()+l+1, res_int.end());
+        func(res_int, l+1, k, n);
+    }
+    
+    int factorial(int n){
+        if(n == 0 && n==1)
+            return 1;
+        int res =1;
+        while(n>0){
+            res *= n;
+            n--;
+        }
+        return res;
+    }
+};
+```
