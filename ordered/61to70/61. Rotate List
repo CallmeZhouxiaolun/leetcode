@@ -1,0 +1,82 @@
+Given a linked list, rotate the list to the right by k places, where k is non-negative.
+
+Example 1:
+
+Input: 1->2->3->4->5->NULL, k = 2
+Output: 4->5->1->2->3->NULL
+Explanation:
+rotate 1 steps to the right: 5->1->2->3->4->NULL
+rotate 2 steps to the right: 4->5->1->2->3->NULL
+Example 2:
+
+Input: 0->1->2->NULL, k = 4
+Output: 2->0->1->NULL
+Explanation:
+rotate 1 steps to the right: 2->0->1->NULL
+rotate 2 steps to the right: 1->2->0->NULL
+rotate 3 steps to the right: 0->1->2->NULL
+rotate 4 steps to the right: 2->0->1->NULL
+
+这道题比较简单，其实就是以倒数第(k%len)个节点为头结点(这里len为链表长度)，前面的节点放在尾部。我们首先写一个计算链表长度的函数，
+然后使用两指针找到倒数第(k%len)个节点即可
+```
+class Solution {
+public:
+    ListNode* rotateRight(ListNode* head, int k) {
+        if(head == NULL || head->next == NULL)
+            return head;
+        int len = length_list(head);
+        k %= len;
+        if(k == 0)
+            return head;
+        ListNode* p= head, *q= head, *pre;
+        while(k-- >0)
+            p= p->next;
+        while(p->next != NULL){
+            p=p->next;
+            q=q->next;
+        }
+        pre = q;
+        q=q->next;
+        pre->next =NULL;
+        p->next = head;
+        return q;
+    }
+    int length_list(ListNode* head){
+        if(head == NULL)
+            return 0;
+        int len =1;
+        ListNode* p=head;
+        while(p->next != NULL){
+            len++;
+            p=p->next; 
+        }
+        return len;
+    }
+};
+```
+
+看到solution之后，发现大佬的思想是一样的，但是操作很简便，他首先遍历得出长度，而后将首尾连接，接着找倒数第(k%len)个节点即可
+```
+class Solution {
+public:
+    ListNode* rotateRight(ListNode* head, int k) {
+        if(head == NULL || head->next == NULL || k ==0)
+            return head;
+        int len=1;
+        ListNode* p =head;
+        while(p->next != NULL){
+            len++;
+            p=p->next;
+        }
+        p->next = head;
+        k %= len;
+        while(len-- >k){
+            p = p->next;
+        }
+        ListNode* res = p->next;
+        p->next =NULL;
+        return res;
+    }
+};
+```
