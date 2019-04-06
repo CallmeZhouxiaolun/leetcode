@@ -1,0 +1,128 @@
+A robot is located at the top-left corner of a m x n grid (marked 'Start' in the diagram below).
+
+The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked 'Finish' in the diagram below).
+
+How many possible unique paths are there?
+Note: m and n will be at most 100.
+
+Example 1:
+
+Input: m = 3, n = 2
+Output: 3
+Explanation:
+From the top-left corner, there are a total of 3 ways to reach the bottom-right corner:
+1. Right -> Right -> Down
+2. Right -> Down -> Right
+3. Down -> Right -> Right
+
+这道题拿到的时候首先采用的是递归的笨方法，最后发现一直Time Limit Exceeded，时间超出，这里也把代码贴出来
+```
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+        int res =0;
+        recursive_func(m, n, 0, 0, res);
+        return res;
+    }
+    void recursive_func(int m, int n, int cr, int cc, int& res){
+        if(cr == m || cc == n)
+            return;
+        else if(cr == m-1 && cc ==n-1){
+            res++;
+            return;
+        }
+        int count=0;
+        while(count <2){
+            if(count == 0){
+                recursive_func(m, n, cr, cc+1, res);
+            }
+            else
+                recursive_func(m, n, cr+1, cc, res);
+            count++;
+        }
+    }
+};
+```
+
+后来采用动态规划的方法来做，但是脑子死机了没有想到dp[...][0]及dp[0][...]的值肯定是1，因为只有一种到达情况，因此采用的是同一斜线上的更新方法
+（i、j索引和相等斜线）,虽然做出来的但是代码较长
+```
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+        vector<vector<int>> dp(m, vector<int>(n, 0));
+        dp[0][0] =1;
+        int sum_value =1;
+        while(sum_value <= m+n-2){
+            int i, j;
+            if(sum_value < n){
+                i =0; j=sum_value;
+            }
+            else{
+                j = n-1; i=sum_value -j;
+            }
+            while((i>=0 && i<m) && (j>=0 && j<n)){
+                if(i-1 <0)
+                    dp[i][j] = dp[i][j-1];
+                else if(j-1 <0)
+                    dp[i][j] = dp[i-1][j];
+                else
+                    dp[i][j] = dp[i-1][j]+dp[i][j-1];
+                i++; j--;
+            }
+            sum_value++;
+        }
+        return dp[m-1][n-1];
+    }
+};
+```
+看了solution之后才想起来明明dp[...][0]及dp[0][...]的值肯定是1，这样我们吧dp全部初始化为1，然后进行两层for循环就可以了
+```
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+        vector<vector<int>> dp(m, vector<int>(n ,1));
+        for(int i=1; i<m; i++){
+            for(int j=1; j<n; j++)
+                dp[i][j] =dp[i-1][j] + dp[i][j-1];
+        }
+        return dp[m-1][n-1];
+    }
+};
+```
+
+大佬的解法总是让人头皮发麻。。。。将空间复杂度缩减到O(n)，设置两个大小为n的数组，一个记录当前行，一个记录前一行，然后对应更新即可
+（因为只与dp[i-1][j]、dp[i][j-1]有关系）
+```
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+        vector<int> pre(n, 1), cur(n, 1);
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                cur[j] = pre[j] + cur[j - 1];
+            }
+            swap(pre, cur);
+        }
+        return pre[n - 1];
+    }
+};
+```
+
+你以为这就结束了？
+
+大佬还有简便方法，上述更新还是对cur更新的,那不如我们去掉pre直接在cur上更新！！！
+```
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+        vector<int> cur(n,1);
+        for(int i=1; i<m; i++){
+            for(int j=1; j<n; j++){
+                cur[j] += cur[j-1];
+            }
+        }
+        return cur[n-1];
+    }
+};
+```
