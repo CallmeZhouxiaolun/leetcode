@@ -1,0 +1,73 @@
+Validate if a given string can be interpreted as a decimal number.
+
+Some examples:
+"0" => true
+" 0.1 " => true
+"abc" => false
+"1 a" => false
+"2e10" => true
+" -90e3   " => true
+" 1e" => false
+"e3" => false
+" 6e-1" => true
+" 99e2.5 " => false
+"53.5e93" => true
+" --6 " => false
+"-+3" => false
+"95a54e53" => false
+
+Note: It is intended for the problem statement to be ambiguous. 
+You should gather all requirements up front before implementing one. 
+However, here is a list of characters that can be in a valid decimal number:
+
+Numbers 0-9
+Exponent - "e"
+Positive/negative sign - "+"/"-"
+Decimal point - "."
+Of course, the context of these characters also matters in the input.
+
+Update (2015-02-10):
+The signature of the C++ function had been updated. 
+If you still see your function signature accepts a const char * argument, 
+please click the reload button to reset your code definition.
+
+我们考虑最复杂的情况 例如：“  -53.5e-93  ”，从前向后进行遍历，首先应该过滤掉前面的空格， 判断第一种情况‘+’/‘-’，而后需要判断数字，
+由于我们需要判断e之前是否有数字，因此我们设置hasNum来记录e之前是否出现数字；然后判断e/E的出现，在里面判断‘+’/‘-’（因为如果没有e/E出现
+不需要再次判断‘+’/‘-’，判断之后需要将husNum恢复为false 这里是为了判断e后是否有数字）；接着过滤后面的空格，如果hasNum为true同时pos==n 
+则返回true，否则返回false
+
+```
+class Solution {
+public:
+    bool isSpace(char ch){ return ch == ' '; }
+    bool isSym(char ch){ return (ch == '+') || (ch == '-'); }
+    bool isDot(char ch){ return ch == '.'; }
+    bool isExp(char ch){ return (ch == 'e') || (ch == 'E'); }
+    
+    bool isNumber(string s) {
+        int n = s.size(), pos=0;
+        bool hasNum =false;
+        while(pos <n && isSpace(s[pos])) pos++;
+        if(pos<n && isSym(s[pos])) pos++;
+        while(pos<n && isdigit(s[pos])){
+            pos++; hasNum= true;
+        }
+        if(pos<n && isDot(s[pos])) pos++;
+        while(pos<n && isdigit(s[pos])){
+            pos++; hasNum= true;
+        }
+        if(pos<n && isExp(s[pos]) && hasNum){
+            hasNum =false;
+            pos++;
+            if(pos<n && isSym(s[pos])) pos++;
+        }
+        while(pos<n && isdigit(s[pos])){
+            pos++; hasNum= true;
+        }
+        while(pos<n && isSpace(s[pos])) pos++;
+        if(pos == n && hasNum)
+            return true;
+        return false;
+    }
+};
+```
