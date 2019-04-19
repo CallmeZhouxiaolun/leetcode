@@ -1,0 +1,142 @@
+Given an array of words and a width maxWidth, format the text such that each line has exactly maxWidth characters and is fully (left and right) justified.
+
+You should pack your words in a greedy approach; that is, pack as many words as you can in each line. Pad extra spaces ' ' when necessary so that each line has exactly maxWidth characters.
+
+Extra spaces between words should be distributed as evenly as possible. If the number of spaces on a line do not divide evenly between words, the empty slots on the left will be assigned more spaces than the slots on the right.
+
+For the last line of text, it should be left justified and no extra space is inserted between words.
+
+Note:
+
+A word is defined as a character sequence consisting of non-space characters only.
+Each word's length is guaranteed to be greater than 0 and not exceed maxWidth.
+The input array words contains at least one word.
+Example 1:
+
+Input:
+words = ["This", "is", "an", "example", "of", "text", "justification."]
+maxWidth = 16
+Output:
+[
+   "This    is    an",
+   "example  of text",
+   "justification.  "
+]
+Example 2:
+
+Input:
+words = ["What","must","be","acknowledgment","shall","be"]
+maxWidth = 16
+Output:
+[
+  "What   must   be",
+  "acknowledgment  ",
+  "shall be        "
+]
+Explanation: Note that the last line is "shall be    " instead of "shall     be",
+             because the last line must be left-justified instead of fully-justified.
+             Note that the second line is also left-justified becase it contains only one word.
+Example 3:
+
+Input:
+words = ["Science","is","what","we","understand","well","enough","to","explain",
+         "to","a","computer.","Art","is","everything","else","we","do"]
+maxWidth = 20
+Output:
+[
+  "Science  is  what we",
+  "understand      well",
+  "enough to explain to",
+  "a  computer.  Art is",
+  "everything  else  we",
+  "do                  "
+]
+
+
+观察格式，我们可以发现当新的string只包含一个单词或者是该行为最后一行时 采用的是左对齐，其他行采用的是两端对其，我自己写的代码采用的是比较笨的方法
+首先提取该行能容纳的单词，而后进行组合；这里组合的时候分别讨论了只包含一个单词、最后一行、其他行三种情况；代码写的比较冗余。
+```
+  vector<string> fullJustify(vector<string>& words, int maxWidth) {
+        vector<string> res;
+        for(int i=0; i<words.size(); ){
+            vector<string> tmp;
+            int curWidth =0;
+            string new_word="";
+            while(i< words.size() && curWidth + words[i].size() +tmp.size()<= maxWidth){
+                curWidth =curWidth + words[i].size() ;
+                tmp.push_back(words[i]);
+                i++;
+            }
+            if(i < words.size()){
+                if(tmp.size() == 1){
+                    new_word += tmp[0];
+                    new_word += string(maxWidth - new_word.size(), ' ');
+                    res.push_back(new_word);
+                    continue;
+                }
+                int result = (maxWidth - curWidth)/(tmp.size()-1), remainder =(maxWidth - curWidth)%(tmp.size()-1);
+                for(int j=0; j< tmp.size(); j++){
+                    string sp(result,' ');
+                    if(j != tmp.size()-1){
+                        if(remainder-- >0)
+                            new_word = new_word + tmp[j] + sp + " ";
+                        else
+                            new_word = new_word + tmp[j] + sp;
+                    }
+                    else
+                        new_word += tmp[j];
+                }
+                res.push_back(new_word);
+            }
+            else{
+                for(int j=0; j<tmp.size()-1;j++)
+                    new_word += tmp[j] +' ';
+                new_word += tmp[tmp.size()-1];
+                new_word += string(maxWidth - new_word.size(), ' ');
+                res.push_back(new_word);
+            }
+            
+        }
+        return res;
+    }
+};
+```
+
+参看solution之后看到了大佬的解法，思路是一样的，但是把组合新单词的代码提取出来形成一个函数：
+函数应该包含的参数有words、需要组合单词组的左端、右端、bool flag、当前单词组长度、最大长度
+这里设置了一个bool类型，用来区分左对齐/两端对齐，代码精简很多。
+```
+class Solution {
+public:
+  vector<string> fullJustify(vector<string>& words, int maxWidth) {
+      vector<string> res;
+      int n= words.size(), l =0, curWidth=0;
+      for(int i =0; i<words.size(); i++){
+          int extend = curWidth + words[i].size() + i-l;
+          if(extend <= maxWidth){
+              curWidth += words[i].size();
+              if(i == n-1)
+                  res.push_back(getPadd(words, l, i, true, curWidth, maxWidth));
+          }
+          else{
+              int r=i-1;
+              res.push_back(getPadd(words, l, r, l==r, curWidth, maxWidth));
+              l= i--; curWidth=0;
+          }
+      }
+      return res;
+  }
+  string getPadd(vector<string>& words, int l, int r, bool flag,int curWidth, int maxWidth){
+      string ans="";
+      int space_cnt = maxWidth - curWidth;
+      int even_padding = flag? 1 : space_cnt/(r-l);
+      int n_left = flag? 0: space_cnt %(r-l);
+      for(int i=l; i<r; i++){
+          ans += words[i] + string(even_padding + (i-l< n_left), ' ');
+      }
+      ans += words[r];
+      return ans + string(maxWidth - ans.size(), ' ');
+  }
+    
+};
+```
