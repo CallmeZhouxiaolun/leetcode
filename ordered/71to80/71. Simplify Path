@@ -1,0 +1,137 @@
+Given an absolute path for a file (Unix-style), simplify it. Or in other words, convert it to the canonical path.
+
+In a UNIX-style file system, a period . refers to the current directory. Furthermore, a double period .. moves the directory up a level. For more information, see: Absolute path vs relative path in Linux/Unix
+
+Note that the returned canonical path must always begin with a slash /, and there must be only a single slash / between two directory names. The last directory name (if it exists) must not end with a trailing /. Also, the canonical path must be the shortest string representing the absolute path.
+
+ 
+
+Example 1:
+
+Input: "/home/"
+Output: "/home"
+Explanation: Note that there is no trailing slash after the last directory name.
+Example 2:
+
+Input: "/../"
+Output: "/"
+Explanation: Going one level up from the root directory is a no-op, as the root level is the highest level you can go.
+Example 3:
+
+Input: "/home//foo/"
+Output: "/home/foo"
+Explanation: In the canonical path, multiple consecutive slashes are replaced by a single one.
+Example 4:
+
+Input: "/a/./b/../../c/"
+Output: "/c"
+Example 5:
+
+Input: "/a/../../b/../c//.//"
+Output: "/c"
+Example 6:
+
+Input: "/a//b////c/d//././/.."
+Output: "/a/b/c"
+
+开始的做法比较繁琐，采用的是从后向前遍历的做法，遇到"."就continue， 设置bool和count，遇到".."就查看bool值同时根据count来进行continue
+遇到其他情况进行插入
+```
+class Solution {
+public:
+   bool isSlash(char ch){
+        return ch == '/';
+    }
+    string simplifyPath(string path) {
+        unordered_map<string, int> mp{{"..", 2}, {".", 1}};
+        if(path.empty())
+            return path;
+        string res="";
+        int i = path.size()-1, count=0;
+        bool flag =true;
+        while(i>=0){
+            while(i >=0 && isSlash(path[i])) i--;
+            string tmp="";
+            while(i>=0 && !isSlash(path[i]))
+                tmp += path[i--];
+			if(tmp.empty())
+				break;
+			reverse(tmp.begin(), tmp.end());
+            if(mp[tmp] == 1)
+                continue;
+            else if(mp[tmp] == 2){
+				count++;
+                flag =false;
+                continue;
+            }
+            if(!flag){
+				if(--count == 0)
+                	flag =true;
+                continue;
+            }
+            else{
+                tmp = '/' + tmp;
+                res.insert(0, tmp);
+            }
+        }
+		if(res.empty())
+			res.push_back('/');
+        return res;
+    }
+};
+```
+后面查看solution之后发现了一种使用stack的方法，记得这种从前往后遍历，还可能回退的可以考虑stack，同时为了分割，还看到了一种新的方式iostringstream
+关于字符流的讲解可以参看：https://www.cnblogs.com/likebeta/archive/2012/07/24/2607397.html
+字符流可以采用getline函数， 原型为：istream& getline(istream &in, string &line, char delim);
+这里in是一个输入流，如cin、ifstream，istringstream等。line是将输入流中的字符串放到这个string中，delim是结束字符，默认情况下是‘\n’
+这里我们采用’/‘作为分隔符。
+
+为了更好的说明getline提取的内容，我们做个简单的示例：
+```
+int main()
+{
+	string path="/a/./b/../../c/";
+	string str;
+	istringstream ss(path);
+	while(getline(ss, str, '/')){
+		cout<<"ch:"<<str<<"."<<endl;
+	}
+   return 0;
+}
+```
+代码输出为
+```
+ch:.
+ch:a.
+ch:..
+ch:b.
+ch:...
+ch:...
+ch:c.
+```
+
+
+```
+class Solution {
+public:
+    string simplifyPath(string path) {
+        stack<string> mystack;
+        istringstream ss(path);
+        string str="";
+        while(getline(ss, str, '/')){
+            if(!str.empty()){
+                if(str == ".." && !mystack.empty())
+                    mystack.pop();
+                else if(str != ".." && str != ".")
+                    mystack.push(str);
+            }
+        }
+        string res;
+        while(!mystack.empty()){
+            res = '/' + mystack.top() + res;
+            mystack.pop();
+        }
+        return res.empty() ? "/": res;
+    }
+};
+```
