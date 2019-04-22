@@ -1,0 +1,71 @@
+There are 2N people a company is planning to interview. The cost of flying the i-th person to city A is costs[i][0], and the cost of flying the i-th person to city B is costs[i][1].
+
+Return the minimum cost to fly every person to a city such that exactly N people arrive in each city.
+
+ 
+
+Example 1:
+
+Input: [[10,20],[30,200],[400,50],[30,20]]
+Output: 110
+Explanation: 
+The first person goes to city A for a cost of 10.
+The second person goes to city A for a cost of 30.
+The third person goes to city B for a cost of 50.
+The fourth person goes to city B for a cost of 20.
+
+The total minimum cost is 10 + 30 + 50 + 20 = 110 to have half the people interviewing in each city.
+ 
+
+Note:
+
+1 <= costs.length <= 100
+It is guaranteed that costs.length is even.
+1 <= costs[i][0], costs[i][1] <= 1000
+
+第一种方法是动态规划，dp[i][j]表示前i+j个人里面i个人选择A市，j个人选择B市
+```
+class Solution {
+public:
+    int twoCitySchedCost(vector<vector<int>>& costs) {
+        int n= costs.size()/2;
+        vector<vector<int>> dp(n+1, vector<int>(n+1));
+        for(int i=1; i<=n; i++){
+            dp[i][0] = dp[i-1][0] + costs[i-1][0];
+        }
+        for(int i=1; i<=n; i++){
+            dp[0][i] = dp[0][i-1] + costs[i-1][1];
+        }
+        for(int i=1; i<=n;i++){
+            for(int j=1; j<=n; j++){
+                dp[i][j] = min(dp[i-1][j] + costs[i+j-1][0], dp[i][j-1]+ costs[i+j-1][1]);
+            }
+        }
+        return dp[n][n];
+    }
+};
+```
+这是首先介绍几个函数：std::nth_element(std::begin(numbers), std::begin(numbers) + count, std::end(numbers) , std::greater<>());
+应用的范围由它的第一个和第三个参数指定。第二个参数是一个指向第 n 个元素的迭代器。th_dement() 的执行会导致第 n 个元素被放置在适当的位置。
+这个范围内，在第 n 个元素之前的元素都小于第 n 个元素，而且它后面的每个元素都会比它大。算法默认用 < 运算符来生成这个结果。
+第 n 个元素之前的元素都小于它，但不必是有序的。同样，第 n 个元素后的元素都大于它，但也不必是有序的。如果第二个参数和第三个参数相同（元素段的末尾），这时这个算法是无效的。
+
+第二个是匿名函数： [](){},讲解如下：https://www.jianshu.com/p/d686ad9de817
+
+我们假设将所有的人全部派往A，我们将costs[i][0]相加，我们需要判断这种决策的好坏，因此，我们定义代价差异costs[i][0]- costs[i][1]; 
+以升序排列这个差异数组，差异越大表面表面我们越不该派往A，应该派往B，我们取前N个派往A 后N个派往B
+```
+class Solution {
+public:
+    int twoCitySchedCost(vector<vector<int>>& costs) {
+        nth_element(costs.begin(), costs.begin() +costs.size()/2, costs.end(), [](vector<int>& a, vector<int>& b){
+            return a[0] - a[1] < b[0] -b[1];
+        });
+        int res =0;
+        for(int i=0; i<costs.size()/2; i++){
+            res += costs[i][0] + costs[i+ costs.size()/2][1];
+        }
+        return res;
+    }
+};
+```
