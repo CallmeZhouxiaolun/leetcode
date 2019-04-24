@@ -1,0 +1,60 @@
+
+Given a string S and a string T, find the minimum window in S which will contain all the characters in T in complexity O(n).
+
+Example:
+
+Input: S = "ADOBECODEBANC", T = "ABC"
+Output: "BANC"
+Note:
+
+If there is no such window in S that covers all characters in T, return the empty string "".
+If there is such window, you are guaranteed that there will always be only one unique minimum window in S.
+
+本题采用滑动窗口思想：
+1、设置两个指针left、right，都初始化指向s字符串的第0个元素
+2、我们使用right扩大滑动窗口，直至得到满足要求的子串（即包含t所有元素的子串）
+3、我们一步一步移动left指针，如果滑动窗口依旧是我们想要的，那么更新最小窗口size
+4、如果left移动，滑动窗口不满足条件，重复step2
+
+本题采用unordered_map来记录t字符串和滑动窗口字符串中出现的字符及其次数（为了防止同一字符出现多次的情况）
+这里letterCounter来记录在滑动窗口中 t字符出现的次数，当letterCounter==t.size()时，就说明找到了。
+这里是因为只有window[c] <= mp[c]才更新letterCounter
+if(window[c] <= mp[c]){  
+    letterCounter++;
+}
+```
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        string minStr ="";
+        if(s.empty() || t.empty())
+            return minStr;
+        unordered_map<char, int> mp;
+        unordered_map<char, int> window;
+        for(int i=0; i<t.size(); i++){
+            mp[t[i]]++;
+        }
+        int minLen=INT_MAX, letterCounter=0;
+        for(int l=0, r=0; r<s.size(); r++){
+            char c= s[r];
+            if(mp.find(c) != mp.end()){
+                window[c]++;
+                if(window[c] <= mp[c]){
+                    letterCounter++;
+                }
+            }
+            if(letterCounter >= t.size()){
+                while((mp.find(s[l])== mp.end()) || (window[s[l]] > mp[s[l]])){
+                    window[s[l]]--;
+                    l++;
+                }
+                if(r-l+1 < minLen){
+                    minLen = r-l+1;
+                    minStr = s.substr(l, minLen);
+                }
+            }
+        }
+        return minStr;
+    }
+};
+```
