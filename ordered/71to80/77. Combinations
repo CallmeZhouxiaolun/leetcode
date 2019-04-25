@@ -1,0 +1,66 @@
+Given two integers n and k, return all possible combinations of k numbers out of 1 ... n.
+
+Example:
+
+Input: n = 4, k = 2
+Output:
+[
+  [2,4],
+  [3,4],
+  [2,3],
+  [1,2],
+  [1,3],
+  [1,4],
+]
+
+这个题最开始能想到用回溯的方法来做，比较简单，代码如下：
+```
+class Solution {
+public:
+    vector<vector<int>> combine(int n, int k) {
+        vector<vector<int>> res;
+        vector<int> cb;
+        backtracking(res, cb, n, k,1);
+        return res;
+    }
+    void backtracking(vector<vector<int>>& res, vector<int>& cb, int n, int k, int c){
+        if(cb.size() == k){
+            res.push_back(cb);
+            return;
+        }
+        for(int i=c; i<=n; i++){
+            cb.push_back(i);
+            backtracking(res, cb, n, k, i+1);
+            cb.pop_back();
+        }
+    }
+};
+
+```
+
+后来看到solution里面用的是迭代的方法
+首先我们push_back最初始的一个，在while里面从后往前寻找第一个可以改变的值，这里res[i]- i == n-k+1指的是每个位置上所能放置的最大值-i等于n-k+1，
+此时该位置不能在更新，找到更新位之后更新，而后后面的每项在前一项基础上+1
+```
+class Solution {
+public:
+    vector<vector<int>> combine(int n, int k) {
+        vector<vector<int>> result;
+        vector<int> res;
+        for(int i=1; i<=k; i++)
+            res.push_back(i);
+        result.push_back(res);
+        while(true){
+            int i=k-1;
+            while(i>=0 && res[i]- i == n-k+1)
+                i--;
+            if(i<0)
+                return result;
+            res[i]++;
+            while(++i<k)
+                res[i] = res[i-1]+1;
+            result.push_back(res);
+        }
+    }
+};
+```
