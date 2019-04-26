@@ -1,0 +1,58 @@
+Given a set of distinct integers, nums, return all possible subsets (the power set).
+
+Note: The solution set must not contain duplicate subsets.
+
+Example:
+
+Input: nums = [1,2,3]
+Output:
+[
+  [3],
+  [1],
+  [2],
+  [1,2,3],
+  [1,3],
+  [2,3],
+  [1,2],
+  []
+]
+
+这道题比较容易想起回溯，方法也比较简单
+```
+class Solution {
+public:
+    vector<vector<int>> subsets(vector<int>& nums) {
+        vector<vector<int>> result;
+        vector<int> res;
+        backtracking(result, res, nums, 0);
+        return result;
+    }
+    void backtracking(vector<vector<int>>& result, vector<int>& res, vector<int>& nums, int n){
+        if(res.size() <= nums.size())
+            result.push_back(res);
+        for(int i=n; i< nums.size(); i++){
+            res.push_back(nums[i]);
+            backtracking(result, res, nums, i+1);
+            res.pop_back();
+        }
+    }
+};
+```
+后来看到solution之后可以采用迭代的方法，思路见链接：https://leetcode.com/problems/subsets/discuss/27278/C%2B%2B-RecursiveIterativeBit-Manipulation
+```
+class Solution {
+public:
+    vector<vector<int>> subsets(vector<int>& nums) {
+        vector<vector<int>> res={{}};
+        for(auto num : nums){
+            int n= res.size();
+            for(int i=0; i<n; i++){
+                res.push_back(res[i]);
+                res.back().push_back(num);
+            }
+        }
+        return res;
+    }
+};
+```
+还有一种使用位操作的方法，能看懂但是自己肯定不能写出来见上面链接
