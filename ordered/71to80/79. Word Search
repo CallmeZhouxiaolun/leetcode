@@ -1,0 +1,46 @@
+Given a 2D board and a word, find if the word exists in the grid.
+
+The word can be constructed from letters of sequentially adjacent cell, where "adjacent" cells are those horizontally or vertically neighboring. The same letter cell may not be used more than once.
+
+Example:
+
+board =
+[
+  ['A','B','C','E'],
+  ['S','F','C','S'],
+  ['A','D','E','E']
+]
+
+Given word = "ABCCED", return true.
+Given word = "SEE", return true.
+Given word = "ABCB", return false.
+
+这里可以采用深度遍历的算法（图的深度优先遍历），从一个节点出发，开始遍历他周围的点，这里需要对位置信息标记，开始时设置了vector<vector<bool>>
+但是发现会TLE,所有采用在board数组上修改的算法。
+```
+class Solution {
+public:
+    bool exist(vector<vector<char>>& board, string word) {
+        for(int i=0; i<board.size(); i++){
+            for(int j=0; j<board[0].size(); j++){
+                if(dfs(board, i, j, word, 0))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+  bool dfs(vector<vector<char>>& board, int i, int j, string& word, int k){
+        if(k == word.size())
+            return true;
+        if(i<0 || i>= board.size()  || j<0 || j>= board[0].size() || board[i][j] != word[k])
+            return false;
+        char c = board[i][j];
+        board[i][j] = '*';
+        bool res = dfs(board, i+1, j, word, k+1) || dfs(board, i-1, j, word, k+1) || 
+            dfs(board, i, j+1, word, k+1) || dfs(board, i, j-1, word, k+1);
+        board[i][j] =c;
+        return res;
+    }
+};
+```
