@@ -1,0 +1,85 @@
+Given a collection of integers that might contain duplicates, nums, return all possible subsets (the power set).
+
+Note: The solution set must not contain duplicate subsets.
+
+Example:
+
+Input: [1,2,2]
+Output:
+[
+  [2],
+  [1],
+  [1,2,2],
+  [2,2],
+  [1,2],
+  []
+]
+
+这道题和78题类似，不一样的地方在于这里多了重复元素。第一想法是利用78题中的迭代方法去做，利用集合排除相同的元素，
+这里注意一点是，对于{1,4,4}和{4,1,4}对于集合来说是不一样的，所以需要对于List<>内元素排序，这里在①、②处排序都可以
+class Solution {
+    public List<List<Integer>> subsetsWithDup(int[] nums) {
+        Arrays.sort(nums);//①
+        Set<List<Integer>> res= new HashSet<>();
+        res.add(new ArrayList<>());
+        for(int i=0; i< nums.length; i++){
+            Set<List<Integer>> add_res = new HashSet<>();
+            for(List<Integer> list: res){
+                List<Integer> tmp = new ArrayList<>(list);
+                tmp.add(nums[i]);
+                //Collections.sort(tmp);//②
+                add_res.add(tmp);
+            }
+            res.addAll(add_res);
+        }
+        return new ArrayList<List<Integer>>(res);
+    }
+}
+
+
+
+后来看了solution之后，发现还是递归的方法最简单，遇到与前一个元素相同的条件则跳过该元素
+class Solution {
+    public List<List<Integer>> subsetsWithDup(int[] nums) {
+        Arrays.sort(nums);
+        List<List<Integer>> res = new ArrayList<>();
+        backtracing(res, new ArrayList<>(), nums, 0);
+        return res;
+    }
+    
+    public void backtracing(List<List<Integer>> res, List<Integer> tmp, int[] nums, int k){
+        res.add(new ArrayList<>(tmp));
+        for(int i=k; i<nums.length; i++){
+            if(i >k && nums[i] == nums[i-1])
+                continue;
+            tmp.add(nums[i]);
+            backtracing(res, tmp, nums, i+1);
+            tmp.remove(tmp.size()-1);
+        }
+    }
+}
+
+
+其实想一想，可以不用set做迭代，拥有重复元素时候就是相当于只对上一轮生成的数据插入
+之前的数据不进行处理就可以，因此我们可以记录下上一轮开始的地方
+详细讲解可以见： https://leetcode.wang/leetCode-90-SubsetsII.html
+代码如下：
+class Solution {
+    public List<List<Integer>> subsetsWithDup(int[] nums) {
+        List<List<Integer>> res= new ArrayList<>();
+        res.add(new ArrayList<>());
+        Arrays.sort(nums);
+        int start=0;
+        for(int i=0; i< nums.length; i++){
+            int n= res.size();
+            for(int j=0; j<n; j++){
+                if(i >0&& nums[i]==nums[i-1] && j<start) continue;
+                List<Integer> tmp = new ArrayList<>(res.get(j));
+                tmp.add(nums[i]);
+                res.add(tmp);
+            }
+            start =n;
+        }
+        return res;
+    }
+}
