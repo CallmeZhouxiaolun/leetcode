@@ -40,3 +40,24 @@ class Solution {
         return root;
     }
 }
+
+我们发现每次都要对中序数组进行一次遍历来找到root的索引， 为了提高效率，我们可以将中序数组的所有元素及其对应索引放入HashMap中，这样查找更为快速
+class Solution {
+    Map<Integer, Integer> map = new HashMap<>();
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        for(int i=0;i<inorder.length; i++)
+            map.put(inorder[i], i);
+        return buildTreeHelper(preorder, 0, preorder.length, inorder, 0, inorder.length);
+        
+    }
+    public TreeNode buildTreeHelper(int[] preorder,int p_start, int p_end, int[] inorder,int i_start,int i_end){
+        if(p_start == p_end)
+            return null;
+        TreeNode root = new TreeNode(preorder[p_start]);
+        int root_index = map.get(root.val);
+        int left_size = root_index - i_start;
+        root.left = buildTreeHelper(preorder, p_start+1, p_start+ left_size+1, inorder, i_start, root_index);
+        root.right = buildTreeHelper(preorder, p_start+left_size+1, p_end, inorder, root_index+1, i_end);
+        return root;
+    }
+}
