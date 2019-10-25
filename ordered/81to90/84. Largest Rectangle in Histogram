@@ -1,0 +1,249 @@
+Given n non-negative integers representing the histogram's bar height where the width of each bar is 1, find the area of largest rectangle in the histogram.
+Above is a histogram where width of each bar is 1, given height = [2,1,5,6,2,3].
+The largest rectangle is shown in the shaded area, which has area = 10 unit.
+
+Example:
+
+Input: [2,1,5,6,2,3]
+Output: 10
+
+
+多种解法可以参照： https://leetcode.wang/leetCode-84-Largest-Rectangle-in-Histogram.html
+
+1. 首先采用暴力法，计算每个高度的最大面积，也就是说计算每个高度的最大宽度，最后求取最大面积
+//暴力法，获取每个高度的最大面积
+class Solution {
+    public int largestRectangleArea(int[] heights) {
+        if(heights.length ==0)
+            return 0;
+        Set<Integer> heightSet = new HashSet<>();
+        for(int i=0; i< heights.length; i++){
+            heightSet.add(heights[i]);
+        }
+        
+        int max_area =0 ;
+        for(int height :heightSet){
+            int width =0, max_width=1;
+            for(int i=0; i< heights.length; i++){
+                if(heights[i] >= height){
+                    width++;
+                }else{
+                    max_width = Math.max(max_width, width);
+                    width =0;
+                }
+            }
+            max_width = Math.max(max_width, width);
+            max_area = Math.max(max_area, max_width* height);
+        }
+        return max_area;
+    }
+}
+
+
+2. 认识了一种新的数据结构：线段树，这里可以参照讲解:https://zhuanlan.zhihu.com/p/34150142
+
+class Solution {
+    public int largestRectangleArea(int[] heights) {
+        if(heights.length==0)
+            return 0;
+        SegmentTree tree = new SegmentTree(heights);
+        tree.build(0);
+        return getMaxArea(tree, 0, heights.length-1, heights);
+    }
+    
+    public  int getMaxArea(SegmentTree tree, int start, int end, int[] heights){
+        if(start > end)
+            return Integer.MIN_VALUE;
+        if(start == end)
+            return heights[start];
+        int min_index = tree.query(0, start, end).min_index;
+        int area1 = heights[min_index] * (end - start+1);
+        int area2 = getMaxArea(tree, start, min_index-1, heights);
+        int area3 = getMaxArea(tree, min_index+1, end, heights);
+        return Math.max(Math.max(area1, area2), area3);
+    }
+}
+
+class Node{
+    int start; //区间起点
+    int end; //区间终点
+    int data; //区间最小值
+    int min_index; //区间最小值对应的数组中的索引
+
+    public Node(int start, int end){
+        this.start = start;
+        this.end = end;
+    }
+}
+
+class SegmentTree
+{
+    private int[] base;
+    private Node[] nodes;
+
+    public SegmentTree(int[] nums){
+        base = new int[nums.length];
+        for(int i=0; i<nums.length; i++){
+            base[i] = nums[i];
+        }
+
+        nodes = new Node[4* nums.length];
+    }
+
+    public void build(int index){
+        Node node = nodes[index];
+        if(node == null){ //等于null表示根节点，需要进行创建
+            nodes[index] = new Node(0, base.length-1);
+            node = nodes[index];
+        }
+
+        if(node.start == node.end){
+            node.data = base[node.start];
+            node.min_index = node.start;
+        }else{
+//            int mid= node.start + (node.end - node.start)>>1;
+            int mid= (node.start+node.end)>>1;
+            nodes[(index<<1) +1] = new Node(node.start, mid);
+            nodes[(index<<1) +2] = new Node(mid+1, node.end);
+            build((index<<1)+1);
+            build((index<<1)+2);
+            if(nodes[(index<<1)+1].data > nodes[(index<<1)+2].data){
+                node.data = nodes[(index<<1)+2].data;
+                node.min_index = nodes[(index<<1)+2].min_index;
+            }else{
+                node.data = nodes[(index<<1)+1].data;
+                node.min_index = nodes[(index<<1)+1].min_index;
+            }
+        }
+    }
+
+    public Node query(int index, int start, int end){
+        Node node = nodes[index];
+        if(node.start > end || node.end < start)
+            return null;
+        if(node.start >=start && node.end <= end){
+            return node;
+        }
+        Node left = query((index<<1)+1, start, end);
+        int data_left = left ==null? Integer.MAX_VALUE: left.data;
+        Node right = query((index<<1)+2, start, end);
+        int data_right = right ==null? Integer.MAX_VALUE : right.data;
+
+        return data_left> data_right? right :left;
+    }
+}
+
+3. 相对于2方法的调整找到最小值位置时间复杂度使整体达到nlog(n)，这里我们强制中分，对于第三区域的计算：
+采用贪婪的思想，每次选两边较高的柱子扩展柱子。然后其实就是求出了 2 个柱子，3 个柱子，4 个柱子，5 个柱子...每种情况的最大值，然后选最大的就可以了。
+①初始的时候是两个柱子，记录此时的面积。②然后加 1 个柱子，选取两边较高的柱子，然后计算此时的面积，更新最大区域面积。
+③不停的重复过程 ②，直到所有柱子遍历完
+
+class Solution {
+    public int largestRectangleArea(int[] heights) {
+        if(heights.length ==0)
+            return 0;
+        return getMaxArea(heights, 0, heights.length-1);
+    }
+    
+    public  int getMaxArea(int[] heights, int left, int right){
+        if(left == right)
+            return heights[left];
+        int mid = left+ ((right-left)>>1);
+        int area1 = getMaxArea(heights, left, mid);
+        int area2 = getMaxArea(heights, mid+1, right);
+        int area3 = getMaxArea(heights, left, mid, right);
+        return Math.max(Math.max(area1, area2), area3);
+    }
+    public  int getMaxArea(int[] heights, int left,int mid, int right){
+        int i= mid, j= mid+1;
+        int min =Math.min(heights[i], heights[j]);
+        int max_area = min*2;
+        while(i>=left && j<=right){
+            min = Math.min(min, Math.min(heights[i], heights[j]));
+            max_area= Math.max(max_area, min*(j-i+1));
+            if(i==left)
+                j++;
+            else if(j==right)
+                i--;
+            else{
+                if(heights[i-1] > heights[j+1])
+                    i--;
+                else
+                    j++;
+            }
+        }
+        return max_area;
+    }
+    
+}
+
+4. 使用动态规划的算法，我们分别计算包含每个bar的最大矩形的面积，然后求取最大。其中也就是从当前点向两边扩散，分别找到第一个比当前值小的值的位置
+主要是找的过程可以优化为O（n）
+class Solution {
+    public int largestRectangleArea(int[] heights) {
+        if(heights.length ==0)
+            return 0;
+        int[] leftMin = new int[heights.length];
+        int[] rightMin = new int[heights.length];
+        leftMin[0] =-1; 
+        rightMin[heights.length-1] = heights.length;
+        for(int i=1; i< heights.length; i++){
+            int p=i-1;
+            while(p>=0 && heights[p] >= heights[i])
+                p= leftMin[p]; //略过中间元素，直接从比p位置小的第一个元素开始即可，因为比p大的肯定比i大
+            leftMin[i] = p;
+        }
+        for(int i= heights.length-2; i>=0; i--){
+            int p= i+1;
+            while(p<heights.length && heights[p] >= heights[i])
+                p = rightMin[p];
+            rightMin[i] =p;
+        }
+        
+        int maxArea =0;
+        for(int i=0; i<heights.length; i++){
+            maxArea = Math.max(maxArea, (rightMin[i]- leftMin[i]-1)*heights[i]);
+        }
+        return maxArea;
+    }
+}
+
+5. 具体讲解见链接，其实就是大于栈顶当前元素就进栈，一直遇到比栈顶元素小的，即栈顶元素右边第一个小于他的值，栈中相邻元素为左边第一个小于它的值；
+其实第四种方法类似，只是该方法不是按顺序计算每个柱子的面积，而实先计算大柱子的面积，等pop之后计算小柱子的面积
+
+class Solution {
+    public int largestRectangleArea(int[] heights) {
+        if(heights.length ==0)
+            return 0;
+        int p=0 ,maxArea =0;
+        Stack<Integer> stack = new Stack<>();
+        while(p< heights.length){
+            if(stack.empty()){
+                stack.push(p);
+                p++;
+            }else{
+                int top =stack.peek();
+                if(heights[p] >= heights[top]){
+                    stack.push(p);
+                    p++;
+                }else{
+                    int height = heights[stack.pop()];
+                    int leftMin = stack.empty()? -1: stack.peek();
+                    int rightMin = p;
+                    maxArea = Math.max(maxArea, height *(rightMin-leftMin-1));
+                }
+            }
+        }
+        while(!stack.empty()){
+            int height = heights[stack.pop()];
+            int leftMin = stack.empty()? -1: stack.peek();
+            int rightMin = heights.length;
+            maxArea = Math.max(maxArea, height*(rightMin- leftMin-1));
+        }
+        return maxArea;
+    }
+}
+
+
+动态规划的时间效率最高
+
