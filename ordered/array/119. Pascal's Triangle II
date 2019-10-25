@@ -22,3 +22,43 @@ class Solution {
         return res;
     }
 }
+
+或者我们可以倒着进行更新，这样就不会存在覆盖
+class Solution {
+    public List<Integer> getRow(int rowIndex) {
+        if(rowIndex< 0)
+            return new ArrayList<>();
+        List<Integer> res = new ArrayList<>();
+        res.add(1);
+        for(int i=1; i<= rowIndex; i++){
+            for(int j=i-1; j>0; j--){
+                int tmp = res.get(j)+res.get(j-1);
+                res.set(j, tmp);
+            }
+            res.add(1);
+        }
+        return res;
+    }
+}
+
+
+在solution发现一种更为简单的方法，直接采用公式来进行计算。
+https://leetcode.wang/leetcode-119-Pascal%27s-TriangleII.html
+每个位置为组合数
+
+class Solution {
+    public List<Integer> getRow(int rowIndex) {
+        if(rowIndex< 0)
+            return new ArrayList<>();
+        List<Integer> res = new ArrayList<>();
+        res.add(1);
+        int n= rowIndex;
+        long pre=1;
+        for(int i=1; i<=n; i++){
+            long tmp = pre* (n-i+1)/i;
+            res.add((int)tmp);
+            pre = tmp;
+        }
+        return res;
+    }
+}
