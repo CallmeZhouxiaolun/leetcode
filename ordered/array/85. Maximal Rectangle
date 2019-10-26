@@ -1,0 +1,263 @@
+Given a 2D binary matrix filled with 0's and 1's, find the largest rectangle containing only 1's and return its area.
+
+Example:
+
+Input:
+[
+  ["1","0","1","0","0"],
+  ["1","0","1","1","1"],
+  ["1","1","1","1","1"],
+  ["1","0","0","1","0"]
+]
+Output: 6
+
+首先能想到的肯定是暴力法，分别计算每个点处的最大矩阵，然后max
+class Solution {
+    public int maximalRectangle(char[][] matrix) {
+        if(matrix.length ==0)
+            return 0;
+        int m= matrix.length, n=matrix[0].length;
+        int maxArea = 0;
+        for(int i=0; i< m; i++){
+            for(int j=0;j <n; j++){
+                if(matrix[i][j] != '1')
+                    continue;
+                int tmp = calculateArea(matrix, maxArea, i,j);
+                maxArea = Math.max(maxArea, tmp);
+            }
+        }
+        return maxArea;
+    }
+    public int calculateArea(char[][] matrix, int maxArea, int row, int col){
+        int m= matrix.length, n=matrix[0].length;
+        int height=0, minWidth =Integer.MAX_VALUE, width=0;
+        for(int i=row; i<m; i++){
+            for(int j= col; j<n; j++){
+                if(matrix[i][j] !='1' || width >=minWidth)
+                    break;
+                width++;
+            }
+            minWidth = Math.min(minWidth, width);
+            width =0;
+            height = i- row+1;
+            maxArea = Math.max(maxArea, height* minWidth);
+        }
+        return maxArea;
+    }
+}
+
+时间复杂度太大，看一下提交成绩很差
+Runtime: 27 ms, faster than 31.31% of Java online submissions for Maximal Rectangle.
+Memory Usage: 40.4 MB, less than 100.00% of Java online submissions for Maximal Rectangle.
+
+solution 发现可以应用84题求解最大矩阵的方法，相当于每层及其之上构成一个类似84题的heights，然后用84的方法求解最大矩阵
+首先使用栈
+
+class Solution {
+    public int maximalRectangle(char[][] matrix) {
+        if(matrix.length ==0)
+            return 0;
+        int m= matrix.length, n = matrix[0].length;
+        int maxArea=0;
+        int[] heights= new int[n];
+        for(int i=0; i<m; i++){
+            for(int j=0; j<n; j++){
+                if(matrix[i][j] == '1')
+                    heights[j] +=1;
+                else
+                    heights[j] =0;
+            }
+            System.out.println(Arrays.toString(heights));
+            maxArea= Math.max(maxArea, largestRectangle(heights));
+        }
+        return maxArea;
+    }
+    
+    public int largestRectangle(int[] heights){
+        int maxArea =0;
+        if(heights.length==0)
+            return 0;
+        Stack<Integer> stack = new Stack<>();
+        int p=0;
+        while(p<heights.length){
+            if(stack.empty()){
+                stack.push(p);
+                p++;
+            }else{
+                int top = stack.peek();
+                if(heights[p] >= heights[top] || stack.empty()){
+                    stack.push(p);
+                    p++;
+                }else{
+                    int height = heights[stack.pop()];
+                    int leftMin = stack.empty()? -1 : stack.peek();
+                    int rightMin = p;
+                    maxArea = Math.max(maxArea, height*(rightMin - leftMin-1));
+                }
+            }
+        }
+        
+        while(!stack.empty()){
+            int height = heights[stack.pop()];
+            int leftMin = stack.empty()? -1: stack.peek();
+            int rightMin = heights.length;
+            maxArea = Math.max(maxArea, height*(rightMin - leftMin-1));
+        }
+        return maxArea;
+    }
+}
+
+其次使用动态规划数组的方法
+Runtime: 14 ms, faster than 55.39% of Java online submissions for Maximal Rectangle.
+Memory Usage: 41.9 MB, less than 97.83% of Java online submissions for Maximal Rectangle.
+
+class Solution {
+    public int maximalRectangle(char[][] matrix) {
+        if(matrix.length ==0)
+            return 0;
+        int m= matrix.length, n = matrix[0].length;
+        int maxArea=0;
+        int[] heights= new int[n];
+        for(int i=0; i<m; i++){
+            for(int j=0; j<n; j++){
+                if(matrix[i][j] == '1')
+                    heights[j] +=1;
+                else
+                    heights[j] =0;
+            }
+            maxArea= Math.max(maxArea, largestRectangle(heights));
+        }
+        return maxArea;
+    }
+    public int largestRectangle(int[] heights){
+        int maxArea =0;
+        if(heights.length==0)
+            return 0;
+        int[] leftMin = new int[heights.length];
+        leftMin[0] = -1;
+        for(int i=1; i< heights.length; i++){
+            int p=i-1;
+            while(p>=0 && heights[p] >= heights[i])
+                p = leftMin[p];
+            leftMin[i] =p;
+        }
+        
+        int[] rightMin = new int[heights.length];
+        rightMin[heights.length-1] = heights.length;
+        for(int i=heights.length-2; i>=0; i--){
+            int p=i+1;
+            while(p<heights.length && heights[p] >= heights[i])
+                p = rightMin[p];
+            rightMin[i] =p;
+        }
+        
+        for(int i=0; i< heights.length; i++){
+            int height = heights[i];
+            int width = rightMin[i] - leftMin[i]-1;
+            maxArea= Math.max(maxArea, height* width);
+        }
+        return maxArea;
+    }
+    
+}
+
+3.在上述使用栈的方法中，我们是先求出所有的heights然后调用栈，其实把我们发现并不需要一次性求出，我们所利用的之后当前的height及之前的height，
+因此我们可以一边求height一边处理栈
+而且之前我们使用while循环处理，第二个while循环是处理栈中剩余的元素，我们可以扩大heights的长度，在尾部加一个0元素，
+这样就可以在一个while循环中处理完所有的数据
+
+class Solution {
+    public int maximalRectangle(char[][] matrix) {
+        if(matrix.length ==0)
+            return 0;
+        int m= matrix.length, n = matrix[0].length;
+        int maxArea=0;
+        int[] heights= new int[n+1];
+        for(int i=0; i<m; i++){
+            Stack<Integer> stack = new Stack<>();
+
+            for(int j=0; j<=n; j++){
+                if(j<n){
+                    if(matrix[i][j] =='1')
+                        heights[j] +=1;
+                    else
+                        heights[j] =0;
+                }
+                
+                if(stack.empty() || heights[j] >= heights[stack.peek()])
+                    stack.push(j);
+                else{
+                    while(!stack.empty() && heights[j] < heights[stack.peek()]){
+                        int height = heights[stack.pop()];
+                        int leftMin = stack.empty()? -1: stack.peek();
+                        int rightMin = j;
+                        maxArea = Math.max(maxArea, height*(rightMin- leftMin-1));
+                    }
+                    stack.push(j);
+                }
+            }
+        }
+        return maxArea;
+    }
+}
+
+Runtime: 29 ms, faster than 18.30% of Java online submissions for Maximal Rectangle.
+Memory Usage: 42.6 MB, less than 89.13% of Java online submissions for Maximal Rectangle.
+
+4.在上述动态规划的解法当中，我们更新一次 heights，就利用之前的算法，求一遍 leftLessMin [ ] 和 rightLessMin [ ]，然后更新面积。
+而其实，我们求 leftLessMin [ ] 和 rightLessMin [ ] 可以利用之前的 leftLessMin [ ] 和 rightLessMin [ ] 来更新本次的。
+以leftLessMin 为例：如果当前新增的层全部是 1，当然这时最完美的情况，那么 leftLessMin [ ] 根本不需要改变。
+而肯定会出现0， 因此我们假设 特定柱子的 leftLessMin = 1，在当前层，由于中间出现了 0。所以不再是之前的 leftLessMin ，
+而是和上次出现 0 的位置进行比较（因为 0 一定比当前柱子小），谁的下标大，更接近当前柱子，就选择谁
+
+class Solution {
+    public int maximalRectangle(char[][] matrix) {
+        if(matrix.length ==0)
+            return 0;
+        int m= matrix.length, n = matrix[0].length;
+        int maxArea=0;
+        int[] leftMin = new int[n];
+        int[] rightMin = new int[n];
+        Arrays.fill(leftMin, -1);
+        Arrays.fill(rightMin, n);
+        int[] heights = new int[n];
+        for(int i=0; i< m;i++){
+            for(int j=0; j<n; j++){
+                if(matrix[i][j] == '1')
+                    heights[j] +=1;
+                else
+                    heights[j] =0;
+            }
+            
+            int boundary =-1;
+            for(int j=0; j<n; j++){
+                if(matrix[i][j] =='1'){
+                    leftMin[j] = Math.max(leftMin[j], boundary);
+                }else{
+                    leftMin[j]=-1;
+                    boundary = j;
+                }
+            }
+            
+            boundary = n;
+            for(int j=n-1; j>=0; j--){
+                if(matrix[i][j] =='1'){
+                    rightMin[j] = Math.min(rightMin[j], boundary);
+                }else{
+                    rightMin[j]=n;
+                    boundary = j;
+                }
+            }
+            
+            for(int j=0; j< heights.length; j++){
+                int height = heights[j];
+                int width = rightMin[j] - leftMin[j]-1;
+                maxArea= Math.max(maxArea, height* width);
+            }
+        }
+        return maxArea;
+    }
+}
+
+Runtime: 4 ms, faster than 96.67% of Java online submissions for Maximal Rectangle.
+Memory Usage: 40.2 MB, less than 100.00% of Java online submissions for Maximal Rectangle
