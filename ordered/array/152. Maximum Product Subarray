@@ -1,0 +1,47 @@
+Given an integer array nums, find the contiguous subarray within an array (containing at least one number) which has the largest product.
+
+Example 1:
+
+Input: [2,3,-2,4]
+Output: 6
+Explanation: [2,3] has the largest product 6.
+Example 2:
+
+Input: [-2,0,-1]
+Output: 0
+Explanation: The result cannot be 2, because [-2,-1] is not a subarray.
+
+
+class Solution {
+    public int maxProduct(int[] nums) {
+        if(nums.length ==0)
+            return 0;
+        int max= nums[0];
+        int min= nums[0];
+        int res= nums[0];
+        for(int i=1; i< nums.length; i++){
+            if(nums[i]< 0){
+                int tmp = max;
+                max = min;
+                min = tmp;
+            }
+            max = Math.max(max*nums[i], nums[i]);
+            min = Math.min(min*nums[i], nums[i]);
+            res = Math.max(res, max);
+        }
+        return res;
+    }
+}
+
+
+太菜了。。没有做出来。。把大佬的解答放在上面
+简单说一下自己的理解：
+ 这道题和之前的 Maximum Subarray 类似，在最大和中，我们需要追踪的是子数组的和，在每一步我们面临两个选择：
+ 1> 扩大子数据的和，即加上当前值
+ 2> 放弃之前和，重新开始一个新的和
+ 判断依据来自于之前和大小与0的比较，之前和小于0 我们执行 2>，否则,我们执行1>
+ 
+ 而本题要求求解最大的连续乘积，这使得问题变得复杂，因为最大乘积可以由当前最大值乘以一个正数得到，也可能由当前最小值乘以一个负数 负负相乘得到。
+ 因此，我们需要追踪两个数，一个正的乘积、一个负的乘积：即：分别表示当前最大乘积和最小乘积来计算下一个位置的最大最小乘积。
+ 每当我们遇到一个负数，正的乘积就会变成负的，负的乘积就会变成正的。在这种情况下，我们只需交换两个产品。
+
