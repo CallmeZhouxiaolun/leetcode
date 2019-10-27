@@ -1,0 +1,45 @@
+Say you have an array for which the ith element is the price of a given stock on day i.
+
+Design an algorithm to find the maximum profit. You may complete as many transactions as you like (i.e., buy one and sell one share of the stock multiple times).
+
+Note: You may not engage in multiple transactions at the same time (i.e., you must sell the stock before you buy again).
+
+Example 1:
+
+Input: [7,1,5,3,6,4]
+Output: 7
+Explanation: Buy on day 2 (price = 1) and sell on day 3 (price = 5), profit = 5-1 = 4.
+             Then buy on day 4 (price = 3) and sell on day 5 (price = 6), profit = 6-3 = 3.
+
+相当于一个曲线,上升下降上升下降,我们要做的就是找到每段上升曲线的最低点和最高点,用min记录最低点;
+下降时,每次min就等于当前值,相当于加0
+class Solution {
+    public int maxProfit(int[] prices) {
+        if(prices.length ==0)
+            return 0;
+        int maxProfit=0, min =prices[0];
+        for(int i=0; i< prices.length-1; i++){
+            if(prices[i] <= prices[i+1])
+                continue;
+            else{
+                maxProfit += prices[i] -min;
+                min = prices[i+1];
+            }
+        }
+        return maxProfit + prices[prices.length-1]-min;
+    }
+}
+
+看了solution之后发现自己好蠢...不需要记录最小点,只要判断是否上升,然后一段段的计算上升的尺度加进去就好了..
+class Solution {
+    public int maxProfit(int[] prices) {
+        if(prices.length ==0)
+            return 0;
+        int maxProfit =0;
+        for(int i=1; i<prices.length ;i++){
+            if(prices[i] >prices[i-1])
+                maxProfit += prices[i] - prices[i-1];
+        }
+        return maxProfit;
+    }
+}
