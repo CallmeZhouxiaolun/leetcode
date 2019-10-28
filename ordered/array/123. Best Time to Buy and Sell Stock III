@@ -96,3 +96,66 @@ class Solution {
         return dp_i20;
     }
 }
+
+上面动态规划的方法都是采用状态机的思想来写的,下面我们直接使用动态规划求出数组和状态转移方程:
+https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/solution/xiang-xi-tong-su-de-si-lu-fen-xi-duo-jie-fa-by--29/
+
+class Solution {
+    public int maxProfit(int[] prices) {
+        if(prices.length ==0)
+            return 0;
+        int n= prices.length;
+        int maxK=2;
+        int[][] dp = new int[n][maxK+1];
+        for(int k= 1; k<=maxK;k++){
+            for(int i=1; i<n; i++){
+                int min =Integer.MAX_VALUE;
+                for(int j=0; j<i; j++){
+                    min = Math.min(min, prices[j]- dp[j][k-1]);
+                }
+                dp[i][k] = Math.max(dp[i-1][k], prices[i] - min);
+            }
+        }
+        return dp[n-1][maxK];
+    }
+}
+
+上述方法每次都需要遍历求取前面的最小值,其实可以直接使用min记录
+class Solution {
+    public int maxProfit(int[] prices) {
+        if(prices.length ==0)
+            return 0;
+        int n= prices.length;
+        int maxK=2, min;
+        int[][] dp = new int[n][maxK+1];
+        for(int k=1; k<=maxK; k++){
+            min = prices[0];
+            for(int i=1; i<n; i++){
+                min = Math.min(min, prices[i] -dp[i][k-1]);
+                dp[i][k] = Math.max(dp[i-1][k], prices[i]-min);
+            }
+        }
+        return dp[n-1][maxK];
+    }
+}
+
+优化优化
+class Solution {
+    public int maxProfit(int[] prices) {
+        if(prices.length ==0)
+            return 0;
+        int n= prices.length;
+        int K=2;
+        int[] dp = new int[K+1];
+        int[] min = new int[K+1];
+        Arrays.fill(min,prices[0]);
+        for(int i=1; i<n; i++){
+            for(int k=1; k<=K; k++){
+                min[k] = Math.min(prices[i]- dp[k-1], min[k]);
+                dp[k] = Math.max(dp[k],prices[i]- min[k]);
+            }
+        }
+        return dp[K];
+    }
+}
+
