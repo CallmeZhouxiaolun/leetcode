@@ -47,3 +47,37 @@ class Solution {
         return dp_0;
     }
 }
+
+
+另一种方式
+class Solution {
+    public int maxProfit(int k, int[] prices) {
+        if(prices.length ==0)
+            return 0;
+        int n=  prices.length;
+        if(k>= n/2)
+            return maxProfit_inf(prices);
+        int[] dp = new int[k+1];
+        int[] min = new int[k+1];
+        Arrays.fill(min, prices[0]);
+        for(int i=1; i<n; i++){
+            for(int j=1; j<=k; j++){
+                min[j] = Math.min(prices[i] - dp[j-1], min[j]);
+                dp[j] = Math.max(dp[j], prices[i] - min[j]);
+            }
+        }
+        return dp[k];
+    }
+    
+    public int maxProfit_inf(int[] prices){
+        if(prices.length ==0)
+            return 0;
+        int dp_0 = 0, dp_1 =Integer.MIN_VALUE;
+        for(int i=0; i<prices.length; i++){ 
+            int tmp =dp_0;
+            dp_0 = Math.max(dp_0, dp_1+prices[i]);
+            dp_1 = Math.max(dp_1, tmp-prices[i]);
+        }
+        return dp_0;
+    }
+}
