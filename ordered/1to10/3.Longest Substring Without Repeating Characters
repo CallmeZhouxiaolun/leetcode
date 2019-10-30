@@ -80,3 +80,44 @@ public:
 };
 
 
+*********************************我是一个分隔符***************************************
+好久不做题，全部忘掉了。。自己写了一个，比较乱， 先贴代码
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        if(s.isEmpty() || s==null)
+            return 0;
+        Map<Character,Integer> mp = new HashMap<>();
+        int left=0, right=0, res=0;
+        while(right < s.length()){
+            if(mp.containsKey(s.charAt(right))){
+                int tmp = mp.get(s.charAt(right));
+                if(tmp>= left){
+                    res = Math.max(res, right-left);
+                    left = Math.max(left, tmp+1);
+                }
+            }
+            mp.put(s.charAt(right), right);
+            right++;
+        }
+        return Math.max(res, right-left);
+    }
+}
+
+然后看别人写的，重新更新了一边，思想一样
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        if(s.isEmpty() || s==null)
+            return 0;
+        Map<Character, Integer> mp = new HashMap<>();
+        int res=0;
+        for(int i=0, j=0; j< s.length(); j++){
+            if(mp.containsKey(s.charAt(j))){
+                i = Math.max(i, mp.get(s.charAt(j))+1);
+            }
+            res = Math.max(res, j-i+1);
+            mp.put(s.charAt(j), j);
+        }
+        return res;
+    }
+}
+
