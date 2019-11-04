@@ -135,3 +135,58 @@ public:
     }
 };
 ```
+
+
+******************************************* 我是萌萌哒分割线 *******************************************
+首先将string以分隔符split进行分割，对各个段进行判断，如果是""或者"." continue，如果是".."就将队列pollLast，否则将其放入队列中
+```
+class Solution {
+    public String simplifyPath(String path) {
+        String[] segments = path.split("/");
+        LinkedList<String> queue = new LinkedList<>();
+        StringBuilder res = new StringBuilder("/");
+        for(int i=0; i<segments.length; i++){
+            if(segments[i].equals("") || segments[i].equals("."))
+                continue;
+            if(segments[i].equals("..")){
+                queue.pollLast();
+                continue;
+            }
+            queue.offer(segments[i]);
+        }
+        int n =queue.size();
+        for(int i=0; i<n; i++){
+            res.append(queue.poll());
+            if(i != n-1)
+                res.append("/");
+        }
+        return res.toString();
+    }
+}
+```
+
+后来发现其实不需要采用for循环加入"/",可以直接使用string的静态方法join
+```
+public static String join(CharSequence delimiter, CharSequence... elements) {
+```
+最后在头部加入"/"即可 
+```
+class Solution {
+    public String simplifyPath(String path) {
+        String[] segments = path.split("/");
+        LinkedList<String> queue = new LinkedList<>();
+        String res =null;
+        for(int i=0; i<segments.length; i++){
+            if(segments[i].equals("") || segments[i].equals("."))
+                continue;
+            if(segments[i].equals("..")){
+                queue.pollLast();
+                continue;
+            }
+            queue.offer(segments[i]);
+        }
+        res = String.join("/",queue);
+        return "/"+res;
+    }
+}
+```
