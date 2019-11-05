@@ -1,0 +1,220 @@
+Implement a basic calculator to evaluate a simple expression string.
+
+The expression string contains only non-negative integers, +, -, *, / operators and empty spaces . The integer division should truncate toward zero.
+
+Example 1:
+
+Input: "3+2*2"
+Output: 7
+Example 2:
+
+Input: " 3/2 "
+Output: 1
+Example 3:
+
+Input: " 3+5 / 2 "
+Output: 5
+
+这里添加加个示例：
+Input: "42"
+Output: 42
+
+Input: "0-2147483647"
+Output: -2147483647
+
+Note:
+You may assume that the given expression is always valid.
+Do not use the eval built-in library function.
+
+自己开始的思路比较简单，就是使用两个栈，一个数字栈、一个符号栈，
+遇到数字进数字栈；遇到符号：若当前符号优先级大于栈顶符号优先级，则push， 否则pop一个符号、两个数字计算，将结果push入数字栈，
+直到当前符号大于栈顶符号优先级/栈空时push
+之前太傻了。。看实力都是一位数字，就没有while循环，后更正
+```
+class Solution {
+    Map<Character, Integer> mp = new HashMap<Character, Integer>(){{
+        put('+',1); put('-',1); put('*',2); put('/',2);
+    }};
+    Stack<Integer> number= new Stack<>();
+    Stack<Character> calculateSign = new Stack<>();
+    public int calculate(String s) {
+        if(s==null || s.isEmpty())
+            return 0;
+        for(int i=0; i<s.length(); i++){
+            if(s.charAt(i) == ' ')
+                continue;
+            if(Character.isDigit(s.charAt(i))){
+                int tmp =0;
+                while (i<s.length() && Character.isDigit(s.charAt(i))){
+                    tmp = tmp*10 +(s.charAt(i)-'0');
+                    i++;
+                }
+                number.push(tmp);
+                i--;
+                continue;
+            }
+            if(calculateSign.isEmpty()) {
+                calculateSign.push(s.charAt(i));
+            }else if(mp.get(s.charAt(i)) >mp.get(calculateSign.peek())){
+                calculateSign.push(s.charAt(i));
+            }else{
+                while(!calculateSign.isEmpty() && mp.get(s.charAt(i)) <= mp.get(calculateSign.peek())){
+                    int num1 = number.pop();
+                    int num2 = number.pop();
+                    calculateNumber(num1,num2);
+                }
+                calculateSign.push(s.charAt(i));
+            }
+
+
+        }
+        while (!calculateSign.isEmpty()){
+            int num1 = number.pop();
+            int num2 = number.pop();
+            calculateNumber(num1,num2);
+            System.out.println(number.peek()+" "+num1+" "+num2);
+        }
+        int res =0, exp=1;
+        while(!number.isEmpty()){
+            res = res+number.pop()*exp;
+            exp *=10;
+        }
+        return res;
+    }
+
+    public void calculateNumber(int num1, int num2){
+        switch(calculateSign.pop()){
+            case '*':
+                number.push(num2 * num1);
+                break;
+            case '/':
+                number.push(num2 / num1);
+                break;
+            case '+':
+                number.push(num2 + num1);
+                break;
+            case '-':
+                number.push(num2 - num1);
+                break;
+        }
+    }
+}
+```
+
+
+x写的规范一点如下：
+```
+class Solution {
+    Map<String, Integer> mp = new HashMap<String , Integer>(){{
+        put("+",1); put("-",1); put("*",2); put("/",2);
+    }};
+    Stack<Integer> number= new Stack<>();
+    Stack<String> calculateSign = new Stack<>();
+    public int calculate(String s) {
+        if(s==null || s.isEmpty())
+            return 0;
+        s = s.trim();
+        //这里$0 表示当前匹配的字符串，即匹配"+"变成" + ",匹配"-"变成" - "
+        s = s.replaceAll("[+\\-*/]", " $0 ");
+        String[] strArray = s.split(" ");
+        int i=0;
+        for(String str: strArray){
+            i++;
+            if(str.equals(""))
+                continue;
+            if(str.matches("\\d+")){
+                number.push(Integer.parseInt(str));
+                if(i== strArray.length){
+                    while(!calculateSign.isEmpty()){
+                        calculateNumber();
+                    }
+                }
+                continue;
+            }
+            if(str.matches("[+\\-*/]")){
+                while(!calculateSign.isEmpty() && mp.get(str) <= mp.get(calculateSign.peek())){
+                    calculateNumber();
+                }
+                calculateSign.push(str);
+            }
+
+        }
+       return number.pop();
+    }
+
+    public void calculateNumber(){
+        int num1 = number.pop();
+        int num2 = number.pop();
+        switch(calculateSign.pop()){
+            case "*":
+                number.push(num2 * num1);
+                break;
+            case "/":
+                number.push(num2 / num1);
+                break;
+            case "+":
+                number.push(num2 + num1);
+                break;
+            case "-":
+                number.push(num2 - num1);
+                break;
+        }
+    }
+}
+```
+
+后面看了solution之后，发现可以一次遍历得出结果，边扫描边计算，默认栈中元素的计算为+，遇到+直接填入数字，遇到-填入-x；
+而遇到乘除直接计算把结果放入栈中
+以3*2-1为例，当遍历到-时，num存储的时2，sign存储的是*,3已经存入stack
+```
+class Solution {
+    public int calculate(String s) {
+        if (s == null || s.isEmpty())
+            return 0;
+        char sign ='+';
+        int num =0;
+        Stack<Integer> stack = new Stack<>();
+        for(int i=0; i<s.length()+1; i++){
+            //最后加一位是为了促使完成最后数的处理  例如3-1
+            char c = i==s.length()? '+' :s.charAt(i);
+            if(c == ' ')
+                continue;
+            else if(Character.isDigit(c)){
+                num = num*10 + (c-'0');
+                continue;
+            }else{
+                if(sign == '+'){
+                    stack.push(num);
+                }else if(sign =='-'){
+                    stack.push(-num);
+                }else if(sign =='*'){
+                    int tmp = stack.pop() * num;
+                    stack.push(tmp);
+                }else if(sign =='/'){
+                    int tmp = stack.pop() /num;
+                    stack.push(tmp);
+                }
+                num =0;
+                sign =c;
+            }
+        }
+        int res =0;
+        while(!stack.isEmpty())
+            res += stack.pop();
+        return res;
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
