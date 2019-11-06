@@ -73,3 +73,26 @@ class Solution {
     }
 }
 ```
+
+后面在看solution的时候发现不需要这们麻烦的对字符串去除前0然后判断，由于每一段都是数字，可以直接转换成int类型然后比较。
+转换会自动去除前面的0，对于长度也不需要额外判断了
+```
+class Solution {
+    public int compareVersion(String version1, String version2) {
+        String[] array1= version1.split("\\.");
+        String[] array2 = version2.split("\\.");
+        int m= array1.length, n=array2.length;
+        int i=0;
+        while(i<m || i<n){
+            int tmp1 = i<m? Integer.parseInt(array1[i]):0;
+            int tmp2 = i<n? Integer.parseInt(array2[i]):0;
+            if(tmp1 == tmp2)
+                i++;
+            else
+                return tmp1>tmp2? 1:-1;
+        }
+        return 0;
+    }
+
+}
+```
