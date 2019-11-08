@@ -1,0 +1,81 @@
+Given a string containing only digits, restore it by returning all possible valid IP address combinations.
+
+Example:
+
+Input: "25525511135"
+Output: ["255.255.11.135", "255.255.111.35"]
+
+典型的递归，主要是判断条件
+```
+class Solution {
+    public List<String> restoreIpAddresses(String s) {
+        List<String> res = new ArrayList<>();
+        if(s==null || s.length()==0 || s.length()>12)
+            return res;
+        backtracing(res, new StringBuilder(), s, 0, 0);
+        return res;
+    }
+    public void backtracing(List<String> res, StringBuilder tmp, String s, int k, int count){
+        if(count ==4 && k ==s.length()){
+            res.add(tmp.substring(0,tmp.length()-1));
+            return;
+        }
+        if(count>4)
+            return;
+        for(int i=k; i<s.length();i++){
+            String t = s.substring(k, i+1);
+            if(t.length()>3 || t.length()>1 && t.charAt(0)=='0' || Integer.valueOf(t)>255)
+                break;
+            int len = tmp.length();
+            tmp.append(t+".");
+            backtracing(res, tmp, s, i+1, count+1);
+            tmp.setLength(len);
+        }
+    }
+}
+```
+
+solution还有一种方法,一样的思想
+class Solution {
+    public List<String> restoreIpAddresses(String s) {
+        List<String> res = new ArrayList<>();
+        if(s.length() <4)
+            return res;
+        backtracing(res, new StringBuilder(), s, 0, 0);
+        return res;
+    }
+    public void backtracing(List<String> res, StringBuilder tmp, String s, int k, int count){
+        if(s.length()-k > 3*(4-count))
+            return;
+        if(k == s.length()){
+            if(count ==4)
+                res.add(tmp.substring(0, tmp.length()-1));
+            return;
+        }
+        if(k> s.length() || count ==4)
+            return;
+
+        StringBuilder before = new StringBuilder(tmp);
+
+        tmp.append(s.charAt(k)+".");
+        backtracing(res, tmp, s, k+1,count+1);
+
+
+        if(s.charAt(k) =='0')
+            return;
+        if(k+1< s.length()){
+            tmp = new StringBuilder(before);
+            tmp.append(s.substring(k,k+2)+".");
+            backtracing(res, tmp, s, k+2,count+1);
+        }
+
+        if(k+2< s.length()){
+            tmp = new StringBuilder(before);
+            Integer num = new Integer(s.substring(k, k+3));
+            if(num >=0 && num <=255){
+                tmp.append(s.substring(k,k+3)+".");
+                backtracing(res, tmp, s, k+3,count+1);
+            }
+        }
+    }
+}
