@@ -1,0 +1,87 @@
+Write a function to check whether an input string is a valid IPv4 address or IPv6 address or neither.
+
+IPv4 addresses are canonically represented in dot-decimal notation, which consists of four decimal numbers, each ranging from 0 to 255, separated by dots ("."), e.g.,172.16.254.1;
+
+Besides, leading zeros in the IPv4 is invalid. For example, the address 172.16.254.01 is invalid.
+
+IPv6 addresses are represented as eight groups of four hexadecimal digits, each group representing 16 bits. The groups are separated by colons (":"). For example, the address 2001:0db8:85a3:0000:0000:8a2e:0370:7334 is a valid one. Also, we could omit some leading zeros among four hexadecimal digits and some low-case characters in the address to upper-case ones, so 2001:db8:85a3:0:0:8A2E:0370:7334 is also a valid IPv6 address(Omit leading zeros and using upper cases).
+
+However, we don't replace a consecutive group of zero value with a single empty group using two consecutive colons (::) to pursue simplicity. For example, 2001:0db8:85a3::8A2E:0370:7334 is an invalid IPv6 address.
+
+Besides, extra leading zeros in the IPv6 is also invalid. For example, the address 02001:0db8:85a3:0000:0000:8a2e:0370:7334 is invalid.
+
+Note: You may assume there is no extra space or special characters in the input string.
+
+Example 1:
+Input: "172.16.254.1"
+
+Output: "IPv4"
+
+Explanation: This is a valid IPv4 address, return "IPv4".
+Example 2:
+Input: "2001:0db8:85a3:0:0:8A2E:0370:7334"
+
+Output: "IPv6"
+
+Explanation: This is a valid IPv6 address, return "IPv6".
+Example 3:
+Input: "256.256.256.256"
+
+Output: "Neither"
+
+Explanation: This is neither a IPv4 address nor a IPv6 address.
+* 首先注意一点：在ipv6的判定上不允许省略 *
+自己的方法比较简单，分别判断是否是ipv4、ipv6，中间提交出错了好几次，都是因为没有判断好条件
+首先我们判断最后一位是否是'.'/':'，因为如果在最后一位，split的数目不包含最后一位右边的，影响我们判断
+1. 判断ipv4
+  分割长度是否为4（ipv4不能省略）
+  对于每块：长度大于3小于等于0、有前导0的直接舍去，对于1-3的需要判断是否都是数字以及是否小于255
+2. 判断ipv6：这里去掉了省略条件，节省了判断
+  分割长度是否为8位
+  对于每块：将长度大于4小于等于0的排除掉，其次匹配是否只包含0-9a-zA-Z
+
+class Solution {
+    public String validIPAddress(String IP) {
+        if(IP==null || IP.length()==0) {
+            return "Neither";
+        }
+        if(IP.contains(".") && validIPV4(IP)){
+            return "IPv4";
+        }
+        if(IP.contains(":") && validIPV6(IP)){
+            return "IPv6";
+        }
+        return "Neither";
+    }
+    public boolean validIPV4(String IP){
+        if(IP.charAt(IP.length()-1) =='.'){ return false;}
+        String[] arrayIP = IP.split("\\.");
+        if(arrayIP.length !=4) {
+            return false;
+        }
+        for(String ip :arrayIP){
+            boolean flag = ip.length()>3 || (ip.length()==0) || (ip.length()!=1 && ip.charAt(0)=='0')|| (!ip.matches("[0-9]+"));
+            if(flag){
+                return false;
+            }
+            if(Integer.parseInt(ip) >255) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean validIPV6(String IP){
+        if(IP.charAt(IP.length()-1) ==':'){ return false;}
+        String[] arrayIP = IP.split(":");
+        if(arrayIP.length !=8) {
+            return false;
+        }
+        for(String ip :arrayIP){
+            if(ip.length()>4 || !ip.matches("[0-9a-fA-F]+")){
+                return false;
+            }
+        }
+        return true;
+    }
+}
