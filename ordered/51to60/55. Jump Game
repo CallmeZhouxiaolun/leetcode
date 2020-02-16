@@ -82,3 +82,26 @@ public:
 };
 ```
 
+首先采用从前到后的策列, r表示能到的最远索引：
+```
+        
+class Solution:
+    def canJump(self, nums: List[int]) -> bool:
+        r = 0
+        for i, n in enumerate(nums):
+            r = max(r, nums[i] +i)
+            if r >= len(nums)-1:
+                return True
+            if r == i:
+                return False
+```       
+还可以从后往前
+```
+class Solution:
+    def canJump(self, nums: List[int]) -> bool:
+        last_idx = len(nums)-1
+        for i in range(len(nums)-2, -1,-1):
+            if i+nums[i] >= last_idx:
+                last_idx = i
+        return last_idx ==0
+ ```
