@@ -67,3 +67,4 @@ class ProductOfNumbers:
         if k >= len(self.res):
             return 0
         return self.res[-1] // self.res[-k-1]
+```
