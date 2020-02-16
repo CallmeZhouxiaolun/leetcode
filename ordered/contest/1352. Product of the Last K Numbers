@@ -1,0 +1,69 @@
+Implement the class ProductOfNumbers that supports two methods:
+
+1. add(int num)
+
+Adds the number num to the back of the current list of numbers.
+2. getProduct(int k)
+
+Returns the product of the last k numbers in the current list.
+You can assume that always the current list has at least k numbers.
+At any time, the product of any contiguous sequence of numbers will fit into a single 32-bit integer without overflowing.
+
+ 
+
+Example:
+
+Input
+["ProductOfNumbers","add","add","add","add","add","getProduct","getProduct","getProduct","add","getProduct"]
+[[],[3],[0],[2],[5],[4],[2],[3],[4],[8],[2]]
+
+Output
+[null,null,null,null,null,null,20,40,0,null,32]
+
+Explanation
+ProductOfNumbers productOfNumbers = new ProductOfNumbers();
+productOfNumbers.add(3);        // [3]
+productOfNumbers.add(0);        // [3,0]
+productOfNumbers.add(2);        // [3,0,2]
+productOfNumbers.add(5);        // [3,0,2,5]
+productOfNumbers.add(4);        // [3,0,2,5,4]
+productOfNumbers.getProduct(2); // return 20. The product of the last 2 numbers is 5 * 4 = 20
+productOfNumbers.getProduct(3); // return 40. The product of the last 3 numbers is 2 * 5 * 4 = 40
+productOfNumbers.getProduct(4); // return 0. The product of the last 4 numbers is 0 * 2 * 5 * 4 = 0
+productOfNumbers.add(8);        // [3,0,2,5,4,8]
+productOfNumbers.getProduct(2); // return 32. The product of the last 2 numbers is 4 * 8 = 32 
+ 
+
+Constraints:
+
+There will be at most 40000 operations considering both add and getProduct.
+0 <= num <= 100
+1 <= k <= 40000
+
+
+解答： 这里我们采用list记录当前元素及其前面所有元素的乘积， 再用除法就可以得到后k个元素的乘积
+这里存在一个点是0的存在： 如果不对0进行处理，那么只要有0出现， 0后面元素的累积都是0，我们就没办法有效计算前缀积
+这里采用的方法是 当遇到0时，重新更新数组，重新计算 当前数到前一个0中间的元素积
+判断k 与 数据长度的大小，当k >= len(self.res) 时意味着后k个元素存在0（之所以为等号，是因此还有一个额外元素1）, 直接返回0
+否则返回self.res[-1] // self.res[-k-1] 这里//是整数除
+
+
+```
+# from functools import reduce
+class ProductOfNumbers:
+
+    def __init__(self):
+        self.res = [1]
+        
+        
+
+    def add(self, num: int) -> None:
+        if num==0:
+            self.res=[1]
+        else:
+            self.res.append(self.res[-1]*num)
+
+    def getProduct(self, k: int) -> int:
+        if k >= len(self.res):
+            return 0
+        return self.res[-1] // self.res[-k-1]
