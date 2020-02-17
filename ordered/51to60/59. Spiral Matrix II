@@ -36,3 +36,54 @@ public:
     }
 };
 ```
+
+
+python 版本
+
+```
+class Solution:
+    def generateMatrix(self, n: int) -> List[List[int]]:
+        if not n:
+            return []
+        high, low, left, right = 0, n-1, 0, n-1
+        res = [[0 for j in range(n)] for i in range(n)]
+        cur =1
+        while True:
+            for i in range(left, right+1):
+                res[high][i] = cur
+                cur+=1
+            high+=1
+            if high >low: break
+            for i in range(high, low+1):
+                res[i][right] = cur
+                cur+=1
+            right -=1
+            if right < left: break
+            for i in range(right, left-1, -1):
+                res[low][i] =cur
+                cur +=1
+            low -=1
+            if low < high: break
+            for i in range(low, high-1, -1):
+                res[i][left] = cur
+                cur +=1
+            left +=1
+            if left > right: break
+        return res
+                
+  ```
+  
+  
+  ```
+  class Solution:
+    def generateMatrix(self, n: int) -> List[List[int]]:
+        res = [[0]*n for _ in range(n)]
+        i, j, di, dj=0, 0, 0,1
+        for k in range(n*n):
+            res[i][j] = k+1
+            if res[(i+di)%n][(j+dj)%n]:
+                di, dj = dj,-di
+            i +=di
+            j +=dj
+```
+
