@@ -112,3 +112,35 @@ struct CompName
  
 // 排序时传入函数对象
 sort(members.begin(), members.end(), CompName());
+
+
+
+python :
+```
+class Solution:
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        intervals.sort(key=lambda x:x[0])
+        res=[]
+        for i in intervals:
+            if not res:
+                res.append(i)
+                continue
+            if i[0] > res[-1][1]:
+                res.append(i)
+            elif i[1]> res[-1][1]:
+                res[-1][1] = i[1]
+        return res
+                
+```
+
+
+class Solution:
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        intervals.sort(key = lambda x: x[0])
+        res =[]
+        for i in intervals:
+            if res and i[0] <= res[-1][1]:
+                res[-1][1] = max(res[-1][1], i[1])
+            else:
+                res.append(i)
+        return res
