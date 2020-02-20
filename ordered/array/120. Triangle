@@ -50,3 +50,28 @@ class Solution {
         return dp[0];
     }
 }
+
+
+python 采用递归的方法
+```
+class Solution:
+    def minimumTotal(self, triangle: List[List[int]]) -> int:
+        for i in range(len(triangle)-2, -1, -1):
+            for j in range(len(triangle[i])):
+                triangle[i][j] += min(triangle[i+1][j], triangle[i+1][j+1])
+            
+        return triangle[0][0]
+                
+```
+下面代码效率更高
+```
+class Solution:
+    def minimumTotal(self, triangle: List[List[int]]) -> int:
+        if not triangle:
+            return
+        dp = [0] *(len(triangle)+1)
+        for row in triangle[::-1]:
+            for j in range(len(row)):
+                dp[j] = min(dp[j], dp[j+1]) + row[j]
+        return dp[0]
+```
