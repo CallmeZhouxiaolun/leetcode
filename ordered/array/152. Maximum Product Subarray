@@ -45,3 +45,22 @@ class Solution {
  因此，我们需要追踪两个数，一个正的乘积、一个负的乘积：即：分别表示当前最大乘积和最小乘积来计算下一个位置的最大最小乘积。
  每当我们遇到一个负数，正的乘积就会变成负的，负的乘积就会变成正的。在这种情况下，我们只需交换两个产品。
 
+
+
+python解决思想如下: 该题思路可见：https://leetcode.wang/leetcode-152-Maximum-Product-Subarray.html
+```
+class Solution:
+    def maxProduct(self, nums: List[int]) -> int:
+        max_value, min_value, res = 1,1,-sys.maxsize-1
+        for i in nums:
+            if i <0:
+                max_value, min_value = min_value, max_value
+            max_value = max(max_value*i, i)
+            min_value = min(min_value*i, i)
+            res = max(res , max_value)
+        return res
+            
+            
+        
+        
+```
