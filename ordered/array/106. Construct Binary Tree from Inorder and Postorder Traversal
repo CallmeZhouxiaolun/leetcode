@@ -48,3 +48,44 @@ class Solution {
         return root;
     }
 }
+
+
+python 做法， 这里解释一下为什么要先赋值right， 是因为每次pop的尾部元素，在postorder中，右子树的元素在尾部，
+因此需要先对右子树进行赋值，防止丢失值
+```
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def buildTree(self, inorder: List[int], postorder: List[int]) -> TreeNode:
+        return self.backtracking(inorder, postorder)
+    
+    def backtracking(self,inorder, postorder):
+        if inorder:
+            tree = TreeNode(postorder.pop())
+            idx = inorder.index(tree.val)
+            tree.right = self.backtracking(inorder[idx+1:], postorder)
+            tree.left = self.backtracking(inorder[:idx], postorder)
+            return tree
+        
+```
+
+老方法虽然复杂点，在提交时效率更高
+```
+class Solution:
+    def buildTree(self, inorder: List[int], postorder: List[int]) -> TreeNode:
+        return self.backtracking(inorder, 0, len(inorder), postorder, 0, len(postorder))
+    
+    def backtracking(self, inorder ,ileft, iright, postorder, pleft, pright):
+        if pleft ==pright:
+            return None
+        tree= TreeNode(postorder[pright-1])
+        idx = inorder.index(tree.val)
+        tree.left = self.backtracking(inorder, ileft, idx, postorder, pleft, pleft+(idx-ileft))
+        tree.right = self.backtracking(inorder, idx+1, iright, postorder, pleft+(idx-ileft), pright-1)
+        return tree
+```
