@@ -61,3 +61,46 @@ class Solution {
         return root;
     }
 }
+
+
+python 版本  带有切片性质
+```
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def buildTree(self, preorder: List[int], inorder: List[int]) -> TreeNode:
+        return self.backtracking(preorder, inorder)
+        
+    
+    def backtracking(self, preorder, inorder):
+        if inorder:
+            tree = TreeNode(preorder.pop(0))
+            idx = inorder.index(tree.val)
+            tree.left = self.backtracking(preorder, inorder[:idx])
+            tree.right = self.backtracking(preorder, inorder[idx+1:])
+            return tree
+```
+
+
+使用老方法: 主要是终止条件的判定 以及左右界限的划分
+```
+class Solution:
+    def buildTree(self, preorder: List[int], inorder: List[int]) -> TreeNode:
+        return self.backtracking(preorder, 0, len(preorder), inorder, 0, len(inorder))
+    
+    def backtracking(self, preorder, pleft, pright, inorder, ileft, iright):
+        if pleft == pright:
+            return None
+        tree = TreeNode(preorder[pleft])
+        idx = inorder.index(tree.val)
+        tree.left = self.backtracking(preorder, pleft+1, pleft +1+(idx-ileft), inorder, ileft, idx)
+        tree.right= self.backtracking(preorder, pleft+1+(idx-ileft),pright, inorder, idx+1, iright)
+        return tree
+        
+```
+      
