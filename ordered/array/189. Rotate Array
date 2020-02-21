@@ -1,0 +1,79 @@
+Given an array, rotate the array to the right by k steps, where k is non-negative.
+
+Example 1:
+
+Input: [1,2,3,4,5,6,7] and k = 3
+Output: [5,6,7,1,2,3,4]
+Explanation:
+rotate 1 steps to the right: [7,1,2,3,4,5,6]
+rotate 2 steps to the right: [6,7,1,2,3,4,5]
+rotate 3 steps to the right: [5,6,7,1,2,3,4]
+Example 2:
+
+Input: [-1,-100,3,99] and k = 2
+Output: [3,99,-1,-100]
+Explanation: 
+rotate 1 steps to the right: [99,-1,-100,3]
+rotate 2 steps to the right: [3,99,-1,-100]
+Note:
+
+Try to come up as many solutions as you can, there are at least 3 different ways to solve this problem.
+Could you do it in-place with O(1) extra space?
+
+
+python  先采用旋转法，首先将整个数据旋转，然后将0-(k-1)旋转，最后将k-()
+```
+class Solution:
+    def rotate(self, nums: List[int], k: int) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        if k>=len(nums):
+            k = k%len(nums)
+        self.reverse(nums,0,len(nums)-1)
+        self.reverse(nums,0,k-1)
+        self.reverse(nums,k,len(nums)-1)
+    
+    def reverse(self, nums, l, r):
+        while l<r:
+            nums[l], nums[r] = nums[r], nums[l]
+            l+=1
+            r-=1
+
+```
+
+更简便：
+```
+class Solution:
+    def rotate(self, nums: List[int], k: int) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        k = k%len(nums)
+        nums.reverse()
+        nums[:k] = nums[:k][::-1]
+        nums[k:] = nums[k:][::-1]
+```
+
+采用循环法：https://leetcode-cn.com/problems/rotate-array/solution/xuan-zhuan-shu-zu-by-leetcode/
+```
+class Solution:
+    def rotate(self, nums: List[int], k: int) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        k, count, start =k%len(nums),0, 0
+        while count < len(nums):
+            current = start
+            pre = nums[start]
+            while True:
+                next_ = (current +k) %len(nums)
+                next_value = nums[next_]
+                nums[next_] = pre
+                current = next_
+                pre = next_value
+                count+=1
+                if current == start:
+                    break
+            start +=1
+```
