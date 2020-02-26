@@ -25,3 +25,45 @@ public:
         return res;
     }
 };
+
+
+
+python 做法： 效率最高的还是rfind
+先strip再倒序：
+```
+class Solution:
+    def lengthOfLastWord(self, s: str) -> int:
+        s = s.strip()
+        
+        count =0
+        for i in s[::-1]:
+            if i==' ':
+                return count
+            count+=1
+        return count
+```
+
+
+主要学习rfind  	在字符串中搜索指定的值，并返回它被找到的最后位置
+```
+class Solution:
+    def lengthOfLastWord(self, s: str) -> int:
+        s = s.strip()
+        if len(s)>0:
+            loc = s.rfind(' ')
+            if loc ==-1:
+                return len(s)
+            else:
+                return len(s[loc+1:])
+        return 0
+      
+```
+
+```
+class Solution:
+    def lengthOfLastWord(self, s: str) -> int:
+        if not s.strip():
+            return 0
+        s_split = s.split()[-1]
+        return len(s_split)
+```
