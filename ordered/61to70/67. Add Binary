@@ -36,3 +36,68 @@ public:
     }
 };
 ```
+
+可对上面的解法进行优化
+我们针对二进制进行讨论： 
+a,b =1 ,1 时候 c =1 res =1; c =0, res=0    a,b =0,0 时候 c =1 res =1; c =0, res=0 因此，当a==b时直接加入c即可
+a, b=0,1 或者 1,0时候， c=1, res =0; c=0, res=1 即加入与c不同的字符即可
+
+针对c的重新赋值，a==b时c=a , a!=b时 c不变即可
+
+```
+class Solution:
+    def addBinary(self, a: str, b: str) -> str:
+        i,j,c= len(a)-1, len(b)-1, '0'
+        res =[]
+        while i>=0 or j >=0 or c=='1':
+            t1 = a[i] if i>=0 else '0'
+            t2 = b[j] if j>=0 else '0'
+            if t1 == t2:
+                res.append(c)
+                c = t1
+            else:
+                res.append('0' if c=='1' else '1')
+            
+            i-=1
+            j-=1
+        return ''.join(res[::-1])
+```
+
+python 做法
+
+首先的做法比较简单，比较乱
+```
+class Solution:
+    def addBinary(self, a: str, b: str) -> str:
+        i, j, count=len(a)-1, len(b)-1, 0
+        res =[]
+        while i>=0 or j >=0:
+            t1, t2 =a[i] if i>=0 else '0', b[j] if j>=0 else '0'
+            if t1 == t2:
+                if count:
+                    res.insert(0, '1')
+                else:
+                    res.insert(0, '0')
+                count =1 if t1 =='1' else 0
+            else:
+                if count:
+                    res.insert(0, '0')
+                else:
+                    res.insert(0,'1')
+            i -=1
+            j -=1
+        
+    
+        return '1'+''.join(res) if count else ''.join(res)
+                    
+```
+
+
+最简单的方法是利用python函数，这里介绍两个
+bin() 返回一个整数 int 或者长整数 long int 的二进制表示。 return str
+int() 函数用于将一个字符串或数字转换为整型。 class int(x, base=10) base -- 进制数，默认十进制。
+```
+class Solution:
+    def addBinary(self, a: str, b: str) -> str:
+        return bin(int(a,2)+int(b,2))[2:]
+```
