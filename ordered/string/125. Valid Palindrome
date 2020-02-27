@@ -34,3 +34,48 @@ class Solution {
         
     }
 }
+
+
+
+
+python   效率最高的是two pointer的方法
+首先先使用two pointer的方法
+```
+class Solution:
+    def isPalindrome(self, s: str) -> bool:
+        if not s:
+            return True
+        i, j =0, len(s)-1
+        while i<j:
+            if not s[i].isalnum():
+                i+=1
+                continue
+            if not s[j].isalnum():
+                j-=1
+                continue
+            if s[i].lower() != s[j].lower():
+                return False
+            i+=1
+            j-=1
+        return True
+        
+```
+
+下面的方法看起来简便，空间效率没那么高
+```
+class Solution:
+    def isPalindrome(self, s: str) -> bool:
+        new_s = [i.lower() for i in s if i.isalnum()]
+        return new_s == new_s[::-1]
+```
+
+
+python 也可以使用regex的方法
+```
+class Solution:
+    def isPalindrome(self, s: str) -> bool:
+        regex = re.compile(r'[^0-9a-zA-Z]')
+        filtered = regex.sub('', s).lower()
+        return filtered== filtered[::-1]
+```
+
