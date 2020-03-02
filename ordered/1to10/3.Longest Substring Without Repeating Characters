@@ -121,3 +121,65 @@ class Solution {
     }
 }
 
+
+
+
+python代码
+第一次写的比较乱，用到了滑动窗口的思想，但是没有更好的舍去不必要检查
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        if not s:
+            return 0
+        i,j=0,1
+        res =1
+        while j<len(s):
+            tmp =set(s[i:j+1])
+            if len(tmp) < j-i+1:
+                res = max(res, len(tmp))
+                i +=1
+                j =i+1
+            else:
+                j+=1
+        return max(res, j-i)
+
+
+看了solution  首先使用滑动窗口的思想，外加set功能
+注意遇到重复字符时，可以直接从前一个重复字符的下一个字符开始，不需要从i+1在进行剪切
+下面的代码虽然也是从i+1开始的，但如果i+1不满足判断条件，还会继续删除，直到删除掉重复元素
+
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        if not s:
+            return 0
+        i,j,res=0,0,0
+        hashset = set()
+        while j < len(s):
+            if s[j] not in hashset:
+                hashset.add(s[j])
+                j +=1
+                res =max(res, j-i)
+            else:
+                hashset.remove(s[i])
+                i+=1
+        return res
+        
+  
+  我们发现在遇到重复元素时，我们依旧从i+1开始，但其实可以直接从重复元素的第一个位置的下一个位置开始
+  例如  a b c d c  当i=0,j=4时候，遇到重复元素，我们不需要从1开始，可以直接从3开始，
+  因此，如果我们直到重复元素的索引时，可以大大简便
+  class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        d={}
+        start ,res=0, 0
+        for j in range(len(s)):
+            if s[j] in d and d[s[j]] >=start:
+                start = d[s[j]] +1
+                d[s[j]] = j
+            else:
+                d[s[j]] = j
+                res = max(res, j-start+1)
+        return res  
+        
+ 注意，这里将存储的索引与start比较是为了判断是否在窗口内，也有可能在窗口之前，不予理会
+ 同时需要更新start 剔除元素，这里最少也要剔除一个，就算新加入一个  也不会超过之前的res
+ 因此，我们只在插入的时候才进行更新res
