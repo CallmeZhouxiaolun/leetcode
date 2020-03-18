@@ -290,7 +290,32 @@ class Solution:
         return reduce(add, stack)
                     
 
-
+其实就是在字符串后加一个+号即可
+```
+class Solution:
+    def calculate(self, s: str) -> int:
+        s +='+0'
+        stack, pre_sign, num =[], '+', 0
+        for c in s:
+            if c==' ':
+                continue
+            if c.isdigit():
+                num = num*10 + int(c)
+                continue
+            else:
+                if pre_sign =='+':
+                    stack.append(num)
+                elif pre_sign=='-':
+                    stack.append(-num)
+                elif pre_sign=='*':
+                    stack.append(stack.pop() * num)
+                elif pre_sign =='/':
+                    stack.append(int(stack.pop() / num))
+                
+                pre_sign =c
+                num=0
+        return sum(stack)
+```
 
 
 
