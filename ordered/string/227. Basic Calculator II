@@ -207,8 +207,88 @@ class Solution {
 ```
 
 
+python 
+很多情况没有考虑到，首先是数字可能是多位不能单字符遍历， 其次有空格 ， 而且 判断当前操作符与栈顶操作符是<=时即可操作
+下面自己的代码写的比较粗糙
 
-
+class Solution:
+    def calculate(self, s: str) -> int:
+        num_stack =[]
+        sign_stack =[]
+        map_dict = {'+':1, '-':1, '*':2, '/':2}
+        num =0
+        for i in range(len(s)):
+            if s[i] ==' ':
+                continue
+            if s[i].isdigit():
+                num = num*10 + int(s[i])
+                continue
+            num_stack.append(num)
+            num =0
+            print(num_stack)
+            while len(sign_stack)>0 and  map_dict[s[i]] <= map_dict[sign_stack[-1]]:
+                tmp = sign_stack.pop()
+                num1 = num_stack.pop()
+                num2 = num_stack.pop()
+                if tmp =='*':
+                    num_stack.append(num1*num2)
+                elif tmp =='/':
+                    num_stack.append(num2 // num1)
+                elif tmp =='+':
+                    num_stack.append(num2 + num1)
+                elif tmp =='-':
+                    num_stack.append(num2 - num1)
+            sign_stack.append(s[i])
+            
+        num_stack.append(num)
+        while len(sign_stack) >0:
+            tmp = sign_stack.pop()
+            num1 = num_stack.pop()
+            num2 = num_stack.pop()
+            if tmp =='*':
+                num_stack.append(num1*num2)
+            elif tmp =='/':
+                num_stack.append(num2 // num1)
+            elif tmp =='+':
+                num_stack.append(num2 + num1)
+            elif tmp =='-':
+                num_stack.append(num2 - num1)
+          
+        res =0
+        for i in num_stack:
+            res = res*10 +i
+        return res
+            
+            
+                
+      
+进一步优化
+class Solution:
+    def calculate(self, s: str) -> int:
+        stack =[]
+        sign, num ='+', 0
+        for i in range(len(s)+1):
+            #使得最后一个符号完成
+            c = s[i] if i< len(s) else '+'
+            if c==' ':
+                continue
+            if c.isdigit():
+                num = num*10 + int(c)
+                continue
+            else:
+                if sign =='+':
+                    stack.append(num)
+                elif sign=='-':
+                    stack.append(-num)
+                elif sign=='*':
+                    stack.append(stack.pop() * num)
+                elif sign =='/':
+                    stack.append(int(stack.pop() / num))
+                
+                sign =c
+                num=0
+        return reduce(add, stack)
+                    
 
 
 
