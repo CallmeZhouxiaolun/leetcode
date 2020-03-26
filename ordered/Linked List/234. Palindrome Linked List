@@ -1,0 +1,55 @@
+Given a singly linked list, determine if it is a palindrome.
+
+Example 1:
+
+Input: 1->2
+Output: false
+Example 2:
+
+Input: 1->2->2->1
+Output: true
+Follow up:
+Could you do it in O(n) time and O(1) space?
+
+
+首先的想法是用数组把链表内容记录下来:
+```
+class Solution:
+    def isPalindrome(self, head: ListNode) -> bool:
+        if not head:
+            return True
+        res,cur =[], head
+        while cur:
+            res.append(cur.val)
+            cur = cur.next
+
+        return res == res[::-1]
+        
+```
+
+
+接下来我们采用一种空间复杂度为O(1)的算法
+首先,我们使用快慢指针找到中心点,然后将后半部分逆置, 再一一比较
+```
+class Solution:
+    def isPalindrome(self, head: ListNode) -> bool:
+        if not head:
+            return head
+        fast, slow = head, head
+        while fast and fast.next:
+            fast = fast.next.next
+            slow = slow.next
+        pre, cur = None, slow
+        while cur:
+            tmp = cur.next
+            cur.next = pre
+            pre = cur
+            cur = tmp
+        while head and pre:
+            if head.val != pre.val:
+                return False
+            head = head.next
+            pre = pre.next
+            
+        return True
+```
