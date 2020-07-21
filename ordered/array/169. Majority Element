@@ -39,3 +39,22 @@ class Solution:
                 val =num
                 n=1
         return val
+
+
+c++解法
+
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        int res=0, count =0;
+        for(int num : nums){
+            if(count <=0){
+                count =1;
+                res = num;
+            }else{
+                count = num==res? count+1 : count-1;
+            }
+        }
+        return res;
+    }
+};
