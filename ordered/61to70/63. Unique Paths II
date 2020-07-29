@@ -52,6 +52,34 @@ public:
 };
 ```
 
+```
+class Solution {
+public:
+    int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+        if(obstacleGrid.empty() || obstacleGrid[0][0])
+            return 0;
+        int m= obstacleGrid.size(), n=obstacleGrid[0].size();
+        vector<int> res(n, 0);
+        for(int i=0; i<n; i++){
+            if(obstacleGrid[0][i])
+                break;
+            res[i] =1;
+        }
+        for(int i=1; i<m; i++){
+            for(int j=0; j<n; j++){
+                if(j==0){
+                    res[j] *= 1-obstacleGrid[i][j]; 
+                }else{
+                    res[j] = (res[j] + res[j-1] ) * (1-obstacleGrid[i][j]);
+                }
+                
+            }
+        }
+        return res[n-1];
+        
+    }
+};
+```
 
 python O(n)的辅助空间
 ```
