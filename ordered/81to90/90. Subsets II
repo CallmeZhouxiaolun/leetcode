@@ -83,3 +83,49 @@ class Solution {
         return res;
     }
 }
+
+
+c++ 解法
+class Solution {
+public:
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        vector<vector<int>> res;
+        vector<int> tmp;
+        sort(nums.begin(), nums.end());
+        dfs(res, tmp, nums, 0);
+        return res;
+    }
+    
+    void dfs(vector<vector<int>>& res, vector<int>& tmp, vector<int>& nums, int i){
+        res.push_back(tmp);
+        for(int j=i; j<nums.size(); j++){
+            if(j>i && nums[j]==nums[j-1])
+                continue;
+            tmp.push_back(nums[j]);
+            dfs(res, tmp, nums, j+1);
+            tmp.pop_back();
+        }
+    }
+};
+
+
+
+class Solution {
+public:
+    vector<vector<int>> subsetsWithDup(vector<int>& nums) {
+        vector<vector<int>> res ={{}};
+        sort(nums.begin(), nums.end());
+        int start =0;
+        for(int i =0; i<nums.size(); i++){
+            int n= res.size();
+            for(int j=0; j<n; j++){
+                if(i>0 &&nums[i] ==nums[i-1] && j<start)
+                    continue;
+                res.push_back(res[j]);
+                res.back().push_back(nums[i]);
+            }
+            start =n;
+        }
+        return res;
+    }
+};
