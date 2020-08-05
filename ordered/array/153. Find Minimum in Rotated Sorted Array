@@ -45,3 +45,39 @@ class Solution:
                 r =mid
         return nums[l]
 ```
+
+c++ 首先比较简单的二分，每次都进行比较
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        int left =0, right = nums.size()-1;
+        int res = INT_MAX;
+        while(left <= right){
+            int mid = left + (right-left)/2;
+            if(nums[mid] <= nums[right]){
+                right = mid-1;
+            }else{
+                left = mid+1;
+            }
+            res= min(res, nums[mid]);
+        }
+        return res;
+    }
+};
+
+不用每次比较
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        int left =0, right = nums.size()-1;
+        while(left < right){
+            int mid = left + (right-left)/2;
+            if(nums[mid] <= nums[right]){
+                right = mid;
+            }else{
+                left = mid+1;
+            }
+        }
+        return nums[left];
+    }
+};
