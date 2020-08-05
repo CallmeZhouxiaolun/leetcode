@@ -64,3 +64,45 @@ class Solution:
         
         
 ```
+
+
+c++ 
+
+class Solution {
+public:
+    int maxProduct(vector<int>& nums) {
+        if(nums.empty())
+            return 0;
+        int max_v = nums[0], min_v = nums[0], res=nums[0];
+        for(int i=1; i<nums.size(); i++){
+            if(nums[i] <0){
+                int tmp = max_v;
+                max_v = min_v;
+                min_v = tmp;
+            }
+            max_v = max(max_v*nums[i], nums[i]);
+            min_v = min(min_v*nums[i], nums[i]);
+            res = max(res, max_v);
+        }
+        return res;
+    }
+};
+
+
+
+class Solution {
+public:
+    int maxProduct(vector<int>& nums) {
+        if(nums.empty())
+            return 0;
+        int max_v =nums[0], min_v=nums[0], res=nums[0];
+        for(int i=1; i< nums.size(); i++){
+            int t1 = max_v * nums[i];
+            int t2 = min_v * nums[i];
+            max_v = max(nums[i], max(t1, t2));
+            min_v = min(nums[i], min(t1, t2));
+            res = max(max_v, res);
+        }
+        return res;
+    }
+};
