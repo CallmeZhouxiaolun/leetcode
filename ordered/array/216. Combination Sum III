@@ -14,6 +14,11 @@ Input: k = 3, n = 9
 Output: [[1,2,6], [1,3,5], [2,3,4]]
 
 比较简单的dfs
+这道题学会了STL的accumulate函数
+accumulate函数将一段数字从头到尾累加起来，或者使用指定的运算符进行运算
+accumulate函数的前两个参数指定累加的范围，第三个参数为累加的初值，第四个参数为进行的操作，默认为累加
+使用accumulate要添加#include<numeric>
+https://blog.csdn.net/Jeanphorn/article/details/45114233
 
 class Solution {
 public:
