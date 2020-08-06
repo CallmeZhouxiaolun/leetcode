@@ -1,0 +1,32 @@
+class Solution {
+public:
+    int minSubArrayLen(int s, vector<int>& nums) {
+        int left=0, right=0, sum=0, res =INT_MAX;
+        while(right < nums.size()){
+            sum += nums[right++];
+            while(sum >=s){
+                res = min(res, right -left);
+                sum -= nums[left++];
+            }
+        }
+        return res==INT_MAX ? 0 : res;
+    }
+};
+
+
+使用双指针，直接看代码
+
+class Solution {
+public:
+    int minSubArrayLen(int s, vector<int>& nums) {
+        int left=0, right=0, sum=0, res =INT_MAX;
+        while(right < nums.size()){
+            sum += nums[right++];
+            while(sum >=s){
+                res = min(res, right -left);
+                sum -= nums[left++];
+            }
+        }
+        return res==INT_MAX ? 0 : res;
+    }
+};
