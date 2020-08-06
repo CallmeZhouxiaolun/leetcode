@@ -1,0 +1,54 @@
+
+Given a sorted integer array nums, where the range of elements are in the inclusive range [lower, upper], return its missing ranges.
+
+Example:
+
+Input: nums = [0, 1, 3, 50, 75], lower = 0 and upper = 99,
+Output: ["2", "4->49", "51->74", "76->99"]
+
+这个题目太恶心了。。我们先忽略溢出情况，看一下思想
+我们使用next记录下一个未出现的位置，那最初即为lower，对于低于next的我们之前已统计忽略；
+而等于next的即该位置出现，下一个未出现位置应该为该位置的下一个位置即next+1；
+至于其他情况，即需要填入res；这里需要区分是填入一个数字还是一个间隔
+
+
+class Solution {
+public:
+    vector<string> findMissingRanges(vector<int>& nums, int lower, int upper) {
+        vector<string> res;
+        long next = lower;
+        /*
+        防止溢出
+        [2147483647]
+        2147483647
+        2147483647
+        */
+        if(lower == INT_MAX)
+            return res;
+        for(int i=0; i< nums.size(); i++){
+            if(nums[i] < next)
+                continue;
+            if(next == nums[i]){
+                next = nums[i]+1;
+                continue;
+            }
+            res.push_back(helper(next, nums[i]-1));
+            /*为了防止溢出，例如
+            [2147483647]
+            0
+            2147483647  
+            */
+            if(nums[i] ==upper)
+                return res;
+            next = nums[i]+1;
+        }
+        if(next <= upper)
+            res.push_back(helper(next, upper));
+        return res;
+    }
+    string helper(int start, int end){
+        if(start == end)
+            return to_string(start);
+        return to_string(start) +"->"+to_string(end);
+    }
+};
