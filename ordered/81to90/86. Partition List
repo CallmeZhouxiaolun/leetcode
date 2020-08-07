@@ -8,6 +8,8 @@ Input: head = 1->4->3->2->5->2, x = 3
 Output: 1->2->2->4->3->5
 
 和数组中的双指针做法一样
+
+这里pos表示将要插入的位置，遇到大于等于x的跳过，小于x的插入到pos，这里需要注意判断pos和pre是否相等。
 ```
 class Solution {
 public:
