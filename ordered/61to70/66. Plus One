@@ -34,3 +34,19 @@ public:
     }
 };
 ```
+
+class Solution {
+public:
+    vector<int> plusOne(vector<int>& digits) {
+        int c=1;
+        for(int i= digits.size()-1; i>=0; i--){
+            int tmp = digits[i] + c;
+            c = tmp / 10;
+            digits[i] = tmp %10;
+        }
+        if(c){
+            digits.insert(digits.begin(), 1);
+        }
+        return digits;
+    }
+};
