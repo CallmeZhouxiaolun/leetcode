@@ -1,0 +1,68 @@
+Given a non-empty array of integers, return the third maximum number in this array. If it does not exist, return the maximum number. The time complexity must be in O(n).
+
+Example 1:
+Input: [3, 2, 1]
+
+Output: 1
+
+Explanation: The third maximum is 1.
+Example 2:
+Input: [1, 2]
+
+Output: 2
+
+Explanation: The third maximum does not exist, so the maximum (2) is returned instead.
+Example 3:
+Input: [2, 2, 3, 1]
+
+Output: 1
+
+Explanation: Note that the third maximum here means the third maximum distinct number.
+Both numbers with value 2 are both considered as second maximum.
+
+
+先说说自己的理解，第k大、第k小很容易想到使用堆的方式来解决，c++中priority_queue内部排序是使用堆来实现的，
+我们可以使用priority_queue作为堆，关于priority_queue的使用：https://blog.csdn.net/weixin_36888577/article/details/79937886
+
+其次中间wrong由重复值导致，因此采用set记录了所有的数值，来进行排除
+第三点在于，当数值数少于3时返回最大值，这里用到了max_element/min_element ，详细使用: https://www.cnblogs.com/xenny/p/10195292.html
+class Solution {
+public:
+    int thirdMax(vector<int>& nums) {
+        priority_queue<int, vector<int>,  greater<int>> pq;
+        set<int> st;
+        for(int num :nums){
+            if(st.find(num) != st.end())
+                continue;
+            if(pq.size() < 3){
+                pq.push(num);
+            }else{
+                if(num > pq.top()){
+                    pq.pop();
+                    pq.push(num);
+                }
+            }
+            st.insert(num);
+        }
+        if(pq.size() < 3)
+            return *max_element(st.begin(), st.end());
+        return pq.top();
+    }
+};
+
+令人惊讶的发现set本身就会有排序的功能， set，multiset，map，multimap都采用红黑树检索，系统根据元素值具有排序
+详细见：https://blog.csdn.net/yas12345678/article/details/52601454
+
+class Solution {
+public:
+    int thirdMax(vector<int>& nums) {
+        set<int> st;
+        for(int num: nums){
+            st.insert(num);
+            if(st.size()>3)
+                st.erase(st.begin());
+        }
+        return st.size()==3? *st.begin() : *st.rbegin();
+    }
+};
+
