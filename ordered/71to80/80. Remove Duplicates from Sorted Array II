@@ -117,4 +117,25 @@ class Solution:
         return pos 
 ```  
         
-        
+       
+在刷一次就忘记了，，，只能靠自己做，先贴一下自己的作方，三个指针，一个指针指向应放置的位置，另外两个指针标志相同值得start、end
+
+class Solution {
+    public:
+    int removeDuplicates(vector<int>& nums) {
+        int i=0, j=0, k=0;
+        nums.push_back(INT_MAX);
+        while(k < nums.size()){
+            if(nums[k] == nums[j]){
+                k++;
+            }else{
+                int count = min(2, k-j);
+                while(count--){
+                    nums[i++] = nums[j];
+                }
+                j =k;
+            }
+        }
+        return i;
+    }
+};
