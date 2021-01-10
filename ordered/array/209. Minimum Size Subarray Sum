@@ -1,32 +1,62 @@
+Given an array of n positive integers and a positive integer s, find the minimal length of a contiguous subarray of which the sum ≥ s. If there isn't one, return 0 instead.
+
+Example: 
+
+Input: s = 7, nums = [2,3,1,2,4,3]
+Output: 2
+Explanation: the subarray [4,3] has the minimal length under the problem constraint.
+Follow up:
+If you have figured out the O(n) solution, try coding another solution of which the time complexity is O(n log n). 
+
+
+
+这种求累计和大于小于s的是很典型的滑动窗口，但是自己卡了很久的问题在于结束条件的判断，
+因为以right < nums.size()作为终止条件很容易错失后续结果，
+例如 2+4+3大于7包括后续的4+3>7,但此时right==nums.size()，因此会丢失部分结果
+因此，我在后面添加了哨兵元素，同时为了避免sum += nums[right++];溢出，额外做了判断，
+即加到最后一个元素还是小于s的话就没必要继续了
+
 class Solution {
 public:
     int minSubArrayLen(int s, vector<int>& nums) {
-        int left=0, right=0, sum=0, res =INT_MAX;
+        if(nums.empty())
+            return 0;
+        int left=0, right=0;
+        int sum=0, res=INT_MAX;
+        nums.push_back(INT_MAX);
         while(right < nums.size()){
-            sum += nums[right++];
-            while(sum >=s){
-                res = min(res, right -left);
-                sum -= nums[left++];
+            if(sum >= s){
+                res = min(res, right-left);
+                sum -= nums[left];
+                left++;
+            }else{
+                if(right == nums.size()-1)
+                    break;
+                sum += nums[right++];
             }
         }
-        return res==INT_MAX ? 0 : res;
+        return res==INT_MAX? 0 :res;
     }
 };
 
 
-使用双指针，直接看代码
+
+还是年轻啊，，，看了评论之后发现有更好的方法来处理结尾和,这样就在循环内结果right==nums.size()的所有情况
 
 class Solution {
 public:
     int minSubArrayLen(int s, vector<int>& nums) {
-        int left=0, right=0, sum=0, res =INT_MAX;
-        while(right < nums.size()){
+        if(nums.empty())
+            return 0;
+        int left=0, right=0;
+        int sum=0, res=INT_MAX;
+        while(right< nums.size()){
             sum += nums[right++];
             while(sum >=s){
-                res = min(res, right -left);
+                res= min(res, right-left);
                 sum -= nums[left++];
             }
         }
-        return res==INT_MAX ? 0 : res;
+        return res == INT_MAX ? 0: res;
     }
 };
