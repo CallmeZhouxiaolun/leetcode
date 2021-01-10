@@ -94,3 +94,30 @@ public:
 };
 
 其次循环法
+class Solution {
+public:
+    void rotate(vector<int>& nums, int k) {
+        int n = nums.size();
+        k = k%n;
+        if(k==0)
+            return;
+        int count=0;
+        for(int start =0; count< n; start++){
+            int current = start;
+            int value = nums[current];
+            while(true){
+                int next_index = (current+k) %n;
+                int next_value = nums[next_index];
+                nums[next_index] = value;
+                current = next_index;
+                value = next_value;
+                count++;
+                if(current == start){
+                    break;
+                }
+            }
+        }
+        return;
+        
+    }
+};
