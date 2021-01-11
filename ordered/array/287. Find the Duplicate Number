@@ -55,3 +55,36 @@ public:
 
 也可以排序来处理，这里就不写了
 
+还有更简单的方法：
+定义 f(x) = nums[x]; 则构成序列 x, nums[x], nums[nums[x]], nums[nums[nums[x]]], ....;
+该序列每个元素是以前一个元素为索引，数组nums中的数据，
+当 x=nums[0]时候，上述序列则构成 一个含有环的链表，该重复元素即成为环的起始点（即142题求链表中环的起始点）
+
+具体转化可以看：https://leetcode.com/problems/find-the-duplicate-number/discuss/72846/My-easy-understood-solution-with-O(n)-time-and-O(1)-space-without-modifying-the-array.-With-clear-explanation.
+
+则该问题转化为求环的起始点
+
+当一个链表有环时，采用快慢指针（快指针每次两步，慢指针每次一步）最终会相遇
+定义链表起始点至环起始点距离为F，环起始点至相遇点距离为a， 环周长为C
+则： 2(F+a) = F +nC + a
+  F +a = nC
+此时我们将快指针从链表起始点重新出发，慢指针从相遇点出发，则当快指针运行到环起始点时行走距离为F，则慢指针为
+nC + F，也在环起始点处，两指针相遇。
+
+class Solution {
+public:
+    int findDuplicate(vector<int>& nums) {
+        int fast =nums[0], slow = nums[0];
+        do{
+            slow = nums[slow];
+            fast = nums[nums[fast]];
+        }while(fast != slow);
+        
+        fast = nums[0];
+        while(fast != slow){
+            fast = nums[fast];
+            slow = nums[slow];
+        }
+        return fast;
+    }
+};
