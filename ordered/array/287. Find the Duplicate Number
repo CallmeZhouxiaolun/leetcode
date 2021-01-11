@@ -61,7 +61,7 @@ public:
 当 x=nums[0]时候，上述序列则构成 一个含有环的链表，该重复元素即成为环的起始点（即142题求链表中环的起始点）
 
 具体转化可以看：https://leetcode.com/problems/find-the-duplicate-number/discuss/72846/My-easy-understood-solution-with-O(n)-time-and-O(1)-space-without-modifying-the-array.-With-clear-explanation.
-
+自己理解： 我们把数组值当作链表指针，则有重复值代表有两个指针指向同一个节点，其他指针都指向不同节点，则构成环
 则该问题转化为求环的起始点
 
 当一个链表有环时，采用快慢指针（快指针每次两步，慢指针每次一步）最终会相遇
