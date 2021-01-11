@@ -44,3 +44,27 @@ public:
     }
 };
 
+
+class Solution {
+public:
+    vector<vector<int>> combinationSum3(int k, int n) {
+        vector<vector<int>> res;
+        vector<int> tmp;
+        helper(res, tmp, k, n, 1);
+        return res;
+    }
+    
+    void helper(vector<vector<int>>& res, vector<int>& tmp, int k, int n, int m){
+        if(n<0 || tmp.size() >k)
+            return;
+        if(tmp.size()==k && n==0){
+            res.push_back(tmp);
+            return;
+        }
+        for(int i=m; i<=9 ; i++){
+            tmp.push_back(i);
+            helper(res, tmp, k, n-i, i+1);
+            tmp.pop_back();
+        }
+    }
+};
