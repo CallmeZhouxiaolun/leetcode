@@ -1,0 +1,104 @@
+Given an array of integers, 1 ≤ a[i] ≤ n (n = size of array), some elements appear twice and others appear once.
+
+Find all the elements that appear twice in this array.
+
+Could you do it without extra space and in O(n) runtime?
+
+Example:
+Input:
+[4,3,2,7,8,2,3,1]
+
+Output:
+[2,3]
+
+
+最简单的就是i使用额外空间辅助
+class Solution {
+public:
+    vector<int> findDuplicates(vector<int>& nums) {
+        int n= nums.size();
+        vector<bool> helper(n+1, 0);
+        vector<int> res;
+        for(int num: nums){
+            if(!helper[num])
+                helper[num] = true;
+            else
+                res.push_back(num);
+        }
+        return res;
+    }
+};
+
+其实有更好的解法
+首先，我们判断当前元素是不是在应有位置， 是则下一个
+否的话，分为两种情况：我们将该元素与其实际应有位置上的元素对比
+1. 相等，则说明该元素重复，是我们想要的
+2. 不等，那我们将当前元素放到其应有位置，其应有位置上的原元素置为当前元素重新进行循环
+
+最初的写法如下：
+class Solution {
+public:
+    vector<int> findDuplicates(vector<int>& nums) {
+        vector<int> res;
+        for(int i=0; i<nums.size(); i++){
+            while(nums[i] != i+1){
+                if(nums[i] == nums[nums[i]-1]){
+                    res.push_back(nums[i]);
+                    break;
+                }
+                else{
+                    swap(nums[i], nums[nums[i]-1]);
+                }
+            }
+        }
+        return res;
+    }
+};
+但是发现实例：[4,3,2,7,8,2,3,1]
+得到的结果是[3,3,2]，也就是说一个元素被添加了两次；
+于是自己想了一个比较粗糙的方法，就是在判断nums[i] == nums[nums[i]-1]，并存入res之后nums[i]元素实际上已经没用了
+我们可以将其置为-1，排除在之后的处理之外
+
+于是AC了！！！！！！！！！！！！！
+
+class Solution {
+public:
+    vector<int> findDuplicates(vector<int>& nums) {
+        vector<int> res;
+        for(int i=0; i<nums.size(); i++){
+            while(nums[i] >=0 && nums[i] != i+1){
+                if(nums[i] == nums[nums[i]-1]){
+                    res.push_back(nums[i]);
+                    nums[i] =-1;
+                    break;
+                }
+                else{
+                    swap(nums[i], nums[nums[i]-1]);
+                }
+            }
+        }
+        return res;
+    }
+};
+
+
+
+
+佛了，，评论区永远有更简单的方法
+// when find a number i, flip the number at position i-1 to negative. 
+// if the number at position i-1 is already negative, i is the number that occurs twice.
+
+
+class Solution {
+public:
+    vector<int> findDuplicates(vector<int>& nums) {
+        vector<int> res;
+        for(int i=0; i<nums.size(); i++){
+            int index= abs(nums[i]) -1;
+            if(nums[index] < 0)
+                res.push_back(index+1);
+            nums[index] = -nums[index];
+        }
+        return res;
+    }
+};
