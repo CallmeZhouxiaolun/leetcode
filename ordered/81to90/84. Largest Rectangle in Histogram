@@ -115,8 +115,122 @@ public:
 };
 
 
+4. 线段树
+具体思路可以参考 ：https://leetcode.wang/leetCode-84-Largest-Rectangle-in-Histogram.html
+目的转换为最小元素索引位置，这类最值、区间问题常常考虑线段树
+线段树介绍可以参照： https://zhuanlan.zhihu.com/p/34150142
+
+class SegTreeNode{
+public:
+    int start;
+    int end;
+    int min_index;
+    SegTreeNode* left;
+    SegTreeNode* right;
+    
+    SegTreeNode(int start_, int end_){
+        this->start = start_;
+        this->end = end_;
+        left = right = NULL;
+    }
+};
 
 
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        if(heights.empty())
+            return 0;
+        SegTreeNode* root = buildSegTree(heights, 0, heights.size()-1);
+        return getMaxArea(root, heights, 0, heights.size()-1);
+    }
+    
+    int getMaxArea(SegTreeNode* root, vector<int>& heights, int start, int end){
+        if(start > end)
+            return -1;
+        if(start == end)
+            return heights[start];
+        int min_index = query(heights, root, start, end);
+        int left_max = getMaxArea(root, heights, start, min_index-1);
+        int right_max = getMaxArea(root, heights, min_index+1, end);
+        return max(heights[min_index] *(end-start+1), max(left_max, right_max));
+    }
+    
+    SegTreeNode* buildSegTree(vector<int>& heights, int start , int end){
+        if(start > end)
+            return NULL;
+        SegTreeNode* root = new SegTreeNode(start, end);
+        if(start == end){
+            root->min_index = start;
+            return root;
+        }else{
+            int mid = (start+ end)/2;
+            root->left = buildSegTree(heights, start, mid);
+            root->right = buildSegTree(heights, mid+1, end);
+            root->min_index = heights[root->left->min_index] > heights[root->right->min_index] ? 
+                root->right->min_index : root->left->min_index;
+            return root;
+        }
+    } 
+    
+    int query(vector<int>& heights, SegTreeNode* root,  int start , int end){
+        if(root ==NULL || start > root->end || end < root->start)
+            return -1;
+        if(start <= root->start && end>= root->end)
+            return root->min_index;
+        
+        int left_min = query(heights, root->left, start, end);
+        int right_min = query(heights, root->right, start, end);
+        if(left_min ==-1)
+            return right_min;
+        if(right_min == -1)
+            return left_min;
+        return heights[left_min] > heights[right_min] ? right_min: left_min;
+    }
+};
+
+
+5. 这个我累了，直接参照上面的连接把，，，人傻了
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        if(heights.empty())
+            return 0;
+        return getMaxArea(heights, 0, heights.size()-1);
+    }
+    
+    int getMaxArea(vector<int>& heights, int left, int right){
+        if(left > right)
+            return -1;
+        if(left == right)
+            return heights[left];
+        int mid = left + (right-left)/2;
+        int left_area = getMaxArea(heights, left, mid);
+        int right_area = getMaxArea(heights, mid+1, right);
+        int mid_area = getMidArea(heights, left, mid, right);
+        return max(mid_area, max(left_area,right_area));
+    }
+    
+    int getMidArea(vector<int>& heights, int left, int mid, int right){
+        int i=mid, j=mid+1;
+        int minHeight = min(heights[i], heights[j]);
+        int area = minHeight * 2;
+        while(i>=left && j<=right){
+            minHeight = min(min(heights[i], heights[j]), minHeight);
+            area = max(area, minHeight*(j-i+1));
+            if(i==left)
+                j++;
+            else if(j==right)
+                i--;
+            else if(heights[i-1] > heights[j+1])
+                i--;
+            else
+                j++;
+        }
+        return area;
+    }
+    
+};
 
 
 
