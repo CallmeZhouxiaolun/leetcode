@@ -10,6 +10,121 @@ Output: 10
 
 多种解法可以参照： https://leetcode.wang/leetCode-84-Largest-Rectangle-in-Histogram.html
 
+
+
+
+又开始c++刷题啦，虽然这道题还是不会做，抄评论咯
+1. 暴力法，我们分别以所有的高度来进行计算，这里的高度就是数组元素值
+
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        if(heights.empty())
+            return 0;
+        set<int> st(heights.begin(), heights.end());
+        int res=0;
+        for(int height : st){
+            int width=0, max_width=0;
+            for(int i=0; i<heights.size(); i++){
+                if(heights[i] >= height){
+                    width++;
+                    max_width = max(width, max_width);
+                }
+                else
+                    width=0;
+                    
+            }
+            res = max(res, max_width * height);
+        }
+        return res;
+    }
+};
+
+TLE了，我们来分析一下
+这里主要的耗时在于针对每一个长度，我们的需要重新遍历对应的最大宽度，想一想能不能保存一下最大的宽度呢？
+1. 首先遍历数组，以每一个元素值为高度，那他的最大宽度是什么呢？ 
+    左右边界应该为最后一个>=该元素的索引位置（即下一个位置元素值<该元素值）
+2. 我们能不能通过一次遍历来获取所有元素对应的左右边界？
+    我们去找第一个小于当前元素的索引位置
+    
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        if(heights.empty())
+            return 0;
+        vector<int> left(heights.size());
+        left[0] = -1;
+        for(int i=1; i<heights.size(); i++){
+            int p = i-1;
+            while(p >=0 && heights[p] >= heights[i])
+                p = left[p];  //注意heights[p] >= heights[i] 则p可以直接跳到left[p]，因为left[p] - p之间的元素都大于heights[p]，肯定也大于heights[i]；
+            left[i] = p;
+        }
+        vector<int> right(heights.size());
+        right[heights.size()-1] = heights.size();
+        for(int i=heights.size()-2; i>=0; i--){
+            int p = i+1;
+            while(p<heights.size() && heights[p] >= heights[i])
+                p = right[p];
+            right[i] = p;
+        }
+        
+        int res =0;
+        for(int i=0; i<heights.size(); i++){
+            res = max(res, heights[i] *(right[i]- left[i] -1));
+        }
+        return res;
+    }
+};
+
+
+3. 通过2的解法，我们知道其实质在于寻找左右两边第一个小于当前元素的索引位置，这里我们可以使用栈来解决；
+    1. 栈为空：push(i)，将当前元素索引推入
+    2. 若heights[i] >= heights[st.top()] 我们不断将当前元素推入，这里就可以发现栈中存储元素其实是递增的
+        也就是说前一个元素就是后一个元素对应的“第一个小于当前元素的索引位置”  这样我们其实以及找到了左边界
+    3. heights[i] < heights[st.top()],此时我们找到了右边界，而左边界已经在栈中，我们可以开始处理以heights[st.top()]为高的矩形面积
+
+    4. 最后，我们遍历完所有元素后，栈中可能还有元素，此时代表右边没有元素比heights[st.top()]更小，即右边界为heights.size()
+
+class Solution {
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        if(heights.empty())
+            return 0;
+        stack<int> st;
+        int res=0;
+        for(int i=0; i<heights.size(); i++){
+            while(!st.empty() && heights[i] < heights[st.top()]){
+                int height = heights[st.top()];
+                st.pop();
+                int left = st.empty() ? -1:st.top();
+                res = max(res, height * (i-left-1));
+            }
+            st.push(i);
+        }
+        cout<<res<<endl;
+        while(!st.empty()){
+            int height = heights[st.top()];
+            st.pop();
+            int left = st.empty() ? -1 : st.top();
+            int right = heights.size();
+            res = max(res, height *(right-left-1));
+        }
+        return res;
+    }
+};
+
+
+
+
+
+
+
+
+
+
+java解法！！！！
+
 1. 首先采用暴力法，计算每个高度的最大面积，也就是说计算每个高度的最大宽度，最后求取最大面积
 //暴力法，获取每个高度的最大面积
 class Solution {
@@ -247,107 +362,5 @@ class Solution {
 
 动态规划的时间效率最高
 
-
-
-又开始c++刷题啦，虽然这道题还是不会做，抄评论咯
-1. 暴力法，我们分别以所有的高度来进行计算，这里的高度就是数组元素值
-
-class Solution {
-public:
-    int largestRectangleArea(vector<int>& heights) {
-        if(heights.empty())
-            return 0;
-        set<int> st(heights.begin(), heights.end());
-        int res=0;
-        for(int height : st){
-            int width=0, max_width=0;
-            for(int i=0; i<heights.size(); i++){
-                if(heights[i] >= height){
-                    width++;
-                    max_width = max(width, max_width);
-                }
-                else
-                    width=0;
-                    
-            }
-            res = max(res, max_width * height);
-        }
-        return res;
-    }
-};
-
-TLE了，我们来分析一下
-这里主要的耗时在于针对每一个长度，我们的需要重新遍历对应的最大宽度，想一想能不能保存一下最大的宽度呢？
-1. 首先遍历数组，以每一个元素值为高度，那他的最大宽度是什么呢？ 
-    左右边界应该为最后一个>=该元素的索引位置（即下一个位置元素值<该元素值）
-2. 我们能不能通过一次遍历来获取所有元素对应的左右边界？
-    我们去找第一个小于当前元素的索引位置
-    
-class Solution {
-public:
-    int largestRectangleArea(vector<int>& heights) {
-        if(heights.empty())
-            return 0;
-        vector<int> left(heights.size());
-        left[0] = -1;
-        for(int i=1; i<heights.size(); i++){
-            int p = i-1;
-            while(p >=0 && heights[p] >= heights[i])
-                p = left[p];  //注意heights[p] >= heights[i] 则p可以直接跳到left[p]，因为left[p] - p之间的元素都大于heights[p]，肯定也大于heights[i]；
-            left[i] = p;
-        }
-        vector<int> right(heights.size());
-        right[heights.size()-1] = heights.size();
-        for(int i=heights.size()-2; i>=0; i--){
-            int p = i+1;
-            while(p<heights.size() && heights[p] >= heights[i])
-                p = right[p];
-            right[i] = p;
-        }
-        
-        int res =0;
-        for(int i=0; i<heights.size(); i++){
-            res = max(res, heights[i] *(right[i]- left[i] -1));
-        }
-        return res;
-    }
-};
-
-
-3. 通过2的解法，我们知道其实质在于寻找左右两边第一个小于当前元素的索引位置，这里我们可以使用栈来解决；
-1. 栈为空：push(i)，将当前元素索引推入
-2. 若heights[i] >= heights[st.top()] 我们不断将当前元素推入，这里就可以发现栈中存储元素其实是递增的
-    也就是说前一个元素就是后一个元素对应的“第一个小于当前元素的索引位置”  这样我们其实以及找到了左边界
-3. heights[i] < heights[st.top()],此时我们找到了右边界，而左边界已经在栈中，我们可以开始处理以heights[st.top()]为高的矩形面积
-
-4. 最后，我们遍历完所有元素后，栈中可能还有元素，此时代表右边没有元素比heights[st.top()]更小，即右边界为heights.size()
-
-class Solution {
-public:
-    int largestRectangleArea(vector<int>& heights) {
-        if(heights.empty())
-            return 0;
-        stack<int> st;
-        int res=0;
-        for(int i=0; i<heights.size(); i++){
-            while(!st.empty() && heights[i] < heights[st.top()]){
-                int height = heights[st.top()];
-                st.pop();
-                int left = st.empty() ? -1:st.top();
-                res = max(res, height * (i-left-1));
-            }
-            st.push(i);
-        }
-        cout<<res<<endl;
-        while(!st.empty()){
-            int height = heights[st.top()];
-            st.pop();
-            int left = st.empty() ? -1 : st.top();
-            int right = heights.size();
-            res = max(res, height *(right-left-1));
-        }
-        return res;
-    }
-};
 
 
