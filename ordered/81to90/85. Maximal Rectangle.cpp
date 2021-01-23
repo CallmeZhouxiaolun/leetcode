@@ -1,7 +1,8 @@
+/*
 Given a 2D binary matrix filled with 0's and 1's, find the largest rectangle containing only 1's and return its area.
 
 Example:
-```
+
 Input:
 [
   ["1","0","1","0","0"],
@@ -10,16 +11,17 @@ Input:
   ["1","0","0","1","0"]
 ]
 Output: 6
-```
+*/
 
-```
+
+/*
 首先采用的是暴力方法，我们以每一个"1"作为矩形的右下角，我们从该点向上遍历，获取所有矩形的面积
 1. 计算以每个元素为右下角时，同行边的长度，即当前元素为第几个"1";
     "1" : matrix[i][j] = j>0 ? (char)(matrix[i][j-1] +1) : matrix[i][j];
     "0" : continue;
 2. 之后我们从该点不断的向上遍历，此时需要注意，随着向上遍历，矩形高度变大，但是宽可能变小，因此需要不断的更新
   width = min(width, matrix[k][j]-'0');
-  
+*/
   
 class Solution {
 public:
@@ -48,7 +50,7 @@ public:
     }
 };
   
-  
+/* 
 2. 我们可以将本题切分为84题，以图例为例：
 [
   ["1","0","1","0","0"],
@@ -64,6 +66,8 @@ public:
 ["1","1","1","1","1"],
 因此可以调用84题的函数，这里我们也复习一下
 ①首先是动态规划
+*/
+
 class Solution {
 public:
     int maximalRectangle(vector<vector<char>>& matrix) {
@@ -111,7 +115,7 @@ public:
     }
 };
 
-② 栈的使用
+//② 栈的使用
 
 int largestRectangle(vector<int>& heights){
     if(heights.empty())
@@ -137,7 +141,7 @@ int largestRectangle(vector<int>& heights){
     return res;
 }
     
-③ 线段树
+//③ 线段树
 
 class SegTreeNode{
 public:
