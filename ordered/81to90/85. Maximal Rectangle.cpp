@@ -219,4 +219,4 @@ public:
         return heights[left_min] < heights[right_min] ? left_min : right_min;
     }
 };
-```
+
