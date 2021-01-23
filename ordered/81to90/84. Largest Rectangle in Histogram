@@ -1,3 +1,4 @@
+/*
 Given n non-negative integers representing the histogram's bar height where the width of each bar is 1, find the area of largest rectangle in the histogram.
 Above is a histogram where width of each bar is 1, given height = [2,1,5,6,2,3].
 The largest rectangle is shown in the shaded area, which has area = 10 unit.
@@ -6,15 +7,15 @@ Example:
 
 Input: [2,1,5,6,2,3]
 Output: 10
+*/
 
-
+/*
 多种解法可以参照： https://leetcode.wang/leetCode-84-Largest-Rectangle-in-Histogram.html
 
-
-
-
 又开始c++刷题啦，虽然这道题还是不会做，抄评论咯
-1. 暴力法，我们分别以所有的高度来进行计算，这里的高度就是数组元素值
+*/ 
+//1. 暴力法，我们分别以所有的高度来进行计算，这里的高度就是数组元素值
+
 
 class Solution {
 public:
@@ -39,14 +40,14 @@ public:
         return res;
     }
 };
-
+/*
 TLE了，我们来分析一下
 这里主要的耗时在于针对每一个长度，我们的需要重新遍历对应的最大宽度，想一想能不能保存一下最大的宽度呢？
 1. 首先遍历数组，以每一个元素值为高度，那他的最大宽度是什么呢？ 
     左右边界应该为最后一个>=该元素的索引位置（即下一个位置元素值<该元素值）
 2. 我们能不能通过一次遍历来获取所有元素对应的左右边界？
     我们去找第一个小于当前元素的索引位置
-    
+*/    
 class Solution {
 public:
     int largestRectangleArea(vector<int>& heights) {
@@ -77,7 +78,7 @@ public:
     }
 };
 
-
+/*
 3. 通过2的解法，我们知道其实质在于寻找左右两边第一个小于当前元素的索引位置，这里我们可以使用栈来解决；
     1. 栈为空：push(i)，将当前元素索引推入
     2. 若heights[i] >= heights[st.top()] 我们不断将当前元素推入，这里就可以发现栈中存储元素其实是递增的
@@ -85,7 +86,7 @@ public:
     3. heights[i] < heights[st.top()],此时我们找到了右边界，而左边界已经在栈中，我们可以开始处理以heights[st.top()]为高的矩形面积
 
     4. 最后，我们遍历完所有元素后，栈中可能还有元素，此时代表右边没有元素比heights[st.top()]更小，即右边界为heights.size()
-
+*/
 class Solution {
 public:
     int largestRectangleArea(vector<int>& heights) {
@@ -114,12 +115,12 @@ public:
     }
 };
 
-
+/*
 4. 线段树
 具体思路可以参考 ：https://leetcode.wang/leetCode-84-Largest-Rectangle-in-Histogram.html
 目的转换为最小元素索引位置，这类最值、区间问题常常考虑线段树
 线段树介绍可以参照： https://zhuanlan.zhihu.com/p/34150142
-
+*/
 class SegTreeNode{
 public:
     int start;
@@ -190,7 +191,7 @@ public:
 };
 
 
-5. 这个我累了，直接参照上面的连接把，，，人傻了
+//5. 这个我累了，直接参照上面的连接把，，，人傻了
 class Solution {
 public:
     int largestRectangleArea(vector<int>& heights) {
@@ -235,12 +236,12 @@ public:
 
 
 
-
+/*
 
 java解法！！！！
 
 1. 首先采用暴力法，计算每个高度的最大面积，也就是说计算每个高度的最大宽度，最后求取最大面积
-//暴力法，获取每个高度的最大面积
+暴力法，获取每个高度的最大面积
 class Solution {
     public int largestRectangleArea(int[] heights) {
         if(heights.length ==0)
@@ -269,7 +270,7 @@ class Solution {
 }
 
 
-2. 认识了一种新的数据结构：线段树，这里可以参照讲解:https://zhuanlan.zhihu.com/p/34150142
+//2. 认识了一种新的数据结构：线段树，这里可以参照讲解:https://zhuanlan.zhihu.com/p/34150142
 
 class Solution {
     public int largestRectangleArea(int[] heights) {
@@ -477,4 +478,4 @@ class Solution {
 动态规划的时间效率最高
 
 
-
+*/
