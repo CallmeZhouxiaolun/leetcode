@@ -12,6 +12,34 @@ Input: "race a car"
 Output: false
 
 比较简单，记得忽略非字母数字
+c++ 版本
+class Solution {
+public:
+    bool isPalindrome(string s) {
+        if(s.empty())
+            return true;
+        int left=0, right=s.size()-1;
+        while(left< right){
+            while(left<right && !isalnum(s[left]))
+                left++;
+            while(left<right && !isalnum(s[right]))
+                right--;
+            if(tolower(s[left]) == tolower(s[right])){
+                left++; right--;
+            }else
+                return false;
+        }
+        return true;
+    }
+};
+
+
+
+
+
+
+java
+
 class Solution {
     public boolean isPalindrome(String s) {
         if(s.length() ==0)
