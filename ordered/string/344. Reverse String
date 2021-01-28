@@ -16,6 +16,21 @@ Input: ["H","a","n","n","a","h"]
 Output: ["h","a","n","n","a","H"]
 
 比较简单
+C++
+class Solution {
+public:
+    void reverseString(vector<char>& s) {
+        int left=0, right=s.size()-1;
+        while(left < right){
+            swap(s[left], s[right]);
+            left++; right--;
+        }
+        
+    }
+};
+
+
+java
 class Solution {
     public void reverseString(char[] s) {
         int n=s.length;
