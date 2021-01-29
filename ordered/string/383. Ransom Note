@@ -10,7 +10,37 @@ canConstruct("aa", "ab") -> false
 canConstruct("aa", "aab") -> true
 
 理解题意后即第一个字符串中所有字符出现数量小于第二个字符串中对应字符出现次数
-      
+
+
+c++  
+class Solution {
+public:
+    bool canConstruct(string ransomNote, string magazine) {
+        unordered_map<char, int> mp_note;
+        for(char c:magazine)
+            mp_note[c] +=1;
+        for(char c: ransomNote){
+            if(--mp_note[c] < 0)
+                return false;
+        }
+        return true;
+    }
+};
+
+还有STL  
+这里可以查看[includes函数解析](http://c.biancheng.net/view/560.html)
+class Solution {
+public:
+    bool canConstruct(string ransomNote, string magazine) {
+        multiset<char> mag(magazine.begin(), magazine.end());
+        multiset<char> ransom(ransomNote.begin(), ransomNote.end());
+        return includes(mag.begin(), mag.end(), ransom.begin(), ransom.end());
+    }
+};
+
+
+python
+
 class Solution:
     def canConstruct(self, ransomNote: str, magazine: str) -> bool:
         dic ={}
