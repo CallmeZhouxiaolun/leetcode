@@ -58,5 +58,41 @@ public:
 
 
 /*
-KMP待续
+本题其实也可以使用kmp算法来做，因为本质上就是从s+s的字符串找s，排除第一个和最后一个字符
+KMP算法可以参考28题
+    https://github.com/CallmeZhouxiaolun/leetcode/blob/master/ordered/21to30/28.%20Implement%20strStr().md
 */
+
+class Solution {
+public:
+    bool repeatedSubstringPattern(string s) {
+        string query = s+s;
+        return kmp(query, s);
+    }
+    
+    bool kmp(string& query, string& pattern){
+        int m= query.size(), n= pattern.size();
+        vector<int> next(n, -1);
+        int i=0, j=-1;
+        while(i< n-1){
+            if(j==-1 || pattern[i] == pattern[j]){
+                i++; j++;
+                next[i] = j;
+            }else{
+                j = next[j];
+            }
+        }
+        
+        i=1,  j=0;
+        while(i< m-1 && j<n){
+            if(j==-1 || query[i] == pattern[j]){
+                i++; j++;
+            }else{
+                j = next[j];
+            }
+        }
+        if(j ==n)
+            return true;
+        return false;
+    }
+};
