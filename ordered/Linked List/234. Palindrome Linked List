@@ -53,3 +53,36 @@ class Solution:
             
         return True
 ```
+
+
+C++ 
+```
+class Solution {
+public:
+    bool isPalindrome(ListNode* head) {
+        ListNode* fast = head;
+        ListNode* slow = fast;
+        while(fast && fast->next){
+            fast = fast->next->next;
+            slow = slow->next;
+        }
+        ListNode* pre = slow;
+        ListNode* cur = slow->next;
+        pre->next = nullptr;
+        while(cur){
+            ListNode* tmp = cur->next;
+            cur->next = pre;
+            pre = cur;
+            cur = tmp;
+        }
+        while(head && pre){
+            if(head->val != pre->val){
+                return false;
+            }
+            head = head->next;
+            pre = pre->next;
+        }
+        return true;
+    }
+};
+```
